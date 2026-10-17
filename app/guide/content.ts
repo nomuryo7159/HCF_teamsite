@@ -4,6 +4,7 @@ export const sections=[
  {id:'files',label:'ファイルごとの説明'},
  {id:'database',label:'データと編集権限'},
  {id:'workflow',label:'変更するときの順番'},
+ {id:'issues',label:'サイトとIssuesの使い分け'},
  {id:'checks',label:'動作確認と困ったとき'},
 ];
 export const checks={tests:'node --experimental-strip-types --test tests/*.test.ts',types:'npx tsc --noEmit',build:'npm run build'};
