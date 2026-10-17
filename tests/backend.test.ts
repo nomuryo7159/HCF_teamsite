@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateData, defaultRecords, validationErrorMessage } from '../lib/model.ts';
-import { permissionsFor, requireSameOrigin } from '../lib/access.ts';
+import { normalizeEmail, requireSameOrigin } from '../lib/access.ts';
 test('rejects impossible dates and reversed ranges',()=>{
  assert.throws(()=>validateData('phase',{title:'A',assignee:'',startDate:'2026-02-30',endDate:''}));
  assert.throws(()=>validateData('phase',{title:'A',assignee:'',startDate:'2026-03-02',endDate:'2026-03-01'}));
@@ -10,12 +10,7 @@ test('rejects executable URLs and accepts optional blanks',()=>{
  assert.throws(()=>validateData('resource',{title:'A',description:'',category:'',url:'javascript:alert(1)'}));
  assert.doesNotThrow(()=>validateData('event',{title:'A',date:'2026-02-28',startTime:'',endTime:'',description:'',url:''}));
 });
-test('owner configuration required and emails normalized',()=>{
- assert.deepEqual(permissionsFor('a@b.com',undefined,true),{signedIn:true,isOwner:false,canEdit:false});
- assert.equal(permissionsFor(' Owner@Example.com ','owner@example.com',false).isOwner,true);
- assert.equal(permissionsFor('editor@example.com','owner@example.com',true).canEdit,true);
- assert.equal(permissionsFor(null,'owner@example.com',true).canEdit,false);
-});
+test('editor input emails are normalized',()=>assert.equal(normalizeEmail(' Owner@Example.com '),'owner@example.com'));
 test('mutation requires matching origin',()=>{
  assert.throws(()=>requireSameOrigin(new Request('https://site.test/api/data',{method:'POST'})));
  assert.throws(()=>requireSameOrigin(new Request('https://site.test/api/data',{headers:{origin:'https://evil.test'}})));

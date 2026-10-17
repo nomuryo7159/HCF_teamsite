@@ -1,40 +1,62 @@
-# 新しいチームの公開サイト
+# HCF Team Site
 
-のむりん・ゆきち・参加予定の1名の活動サイトです。チーム名と目的は画面から変更できます。
+朝から健康的に活動するチームの公開サイトです。チーム名・目的・メンバーはログイン後の画面から変更できます。
 
-## 利用する機能
+## 機能
 
-チーム紹介、メンバー、活動ルール、工程の期間・並び順・進捗、タスクの追加・編集・完了・担当フィルター、月別予定、週次スレッド、検索できる議事録、共有資料リンクを備えます。
-全内容を公開し、登録した編集者だけが更新できます。管理者は編集メンバーを追加・解除できます。メールは公開APIには含まれず、招待メールも送信しません。
+チーム紹介、活動ルール、工程・WBS・進捗、タスク、予定、週次スレッド、検索できる議事録、共有資料、実装ガイド（`/guide`）を備えます。公開内容は誰でも閲覧し、編集は登録したメンバーに限定します。
 
 ## 実行環境
 
-Node.js 22.13以上、npm、React、Vinext、Cloudflare D1。Sitesの管理された認証・ホスティングを使用します。
+Node.js 22.13以上、Next.js 16、React 19、Supabase、Vercel。
 
-1. `npm ci` で依存関係をインストールします。
-2. `npm run build` でビルドします。
-3. 初回だけ `node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_zippy_lila_cheney.sql` を実行し、ローカルDBを作成します。
-4. ローカル専用の `.dev.vars` に `OWNER_EMAIL=seedy@sites.test` を設定します。
-5. `npm run dev` を実行し、表示されたURLを開きます。ローカルの「メンバーログイン」はテスト専用アカウントです。
+1. `npm ci` でパッケージをインストールします。
+2. `.env.example` を `.env.local` にコピーし、利用するSupabaseプロジェクトの公開URLと公開キーを設定します。
+3. 管理者が初回だけ `supabase/migrations/202610170001_hcf_workspace.sql` をSupabaseのSQL Editorで実行します。
+4. HCF_ENROLLMENT_SECRETのSHA-256ハッシュをhcf_settingsへ登録し、管理者のメールを `public.hcf_editors` に `role='owner'` として登録します。実際のメールアドレスはGitに登録しません。
+5. `npm run dev` で起動し、表示されたURLを開きます（通常 `http://127.0.0.1:5173/`）。
 
-本番の `OWNER_EMAIL` はSitesの秘密の環境変数で設定します。実際のアドレスをソースに保存しません。本番ログインはプラットフォームが担当し、ローカルの模擬ログインは本番ビルドに含みません。
+`.env.local` はGit無視対象です。サービスロールキーは使いません。従来のSites認証・Cloudflare D1・模擬ログインは使用しません。
 
-## 検証
+同じSupabase接続先を設定したローカルと本番は、同じデータを使います。実DBの確認用SQLはトランザクション内で実行し、最後にロールバックします。
 
-- `node --experimental-strip-types --test tests/*.test.ts`
-- `npx tsc --noEmit`
-- `npm run build`
+## ログイン
 
-APIはサーバーでログイン・権限・Origin・入力・改訂番号を確認します。工程順序は一括で保存し、同時更新は409で拒否します。工程にタスクがある場合は工程を削除できません。先にタスクの工程を変更してください。
+`/login` でメールアドレスを入力し、届いたリンクを同じブラウザーで開きます。Supabaseの認証設定に、サイトURLと `/auth/callback` のリダイレクトURLを登録します。既存プロジェクトのほかのリダイレクトURLは削除しません。
 
-## 実装ガイド
+`hcf_editors` に登録され、このサイトのメール確認コールバックを完了した人だけが編集できます。管理者は画面から編集者を追加・解除できます。メールアドレスは公開APIに含めません。Supabaseの標準メール送信には制限があるため、チームの運用人数に応じてSMTP設定を確認してください。
 
-ブラウザーで `/guide` を開くか、ヘッダー・共有資料欄の「実装ガイド」から閲覧できます。起動手順、設計、検索できるファイル一覧、説明のタブ切り替え、コマンドのコピーを備えます。内容は `app/guide/content.ts`、画面は `app/guide/guide.tsx` で管理します。
+## 保存と権限
 
-## データ
+このサイトは `hcf_` 接頭辞の専用テーブル・関数だけを使用します。既存プロジェクトの無関係なテーブルは変更しません。
 
-公開データは `records`、非公開の編集許可は `editors` に保存します。ローカルDBと本番DBは独立しています。テスト用の記録は本番に送信しません。ファイルそのもののアップロードやSlack・Driveの自動同期は含まず、共有URLを登録します。
+- `hcf_records`: 公開する活動記録。RLSで削除済みの記録を非公開にします。
+- `hcf_editors`: 管理者・編集者の許可。匿名からの参照を拒否します。
+- `hcf_verified_users`: このサイトでメール確認を完了したユーザーIDとメール。公開しません。
+- `hcf_settings`: メール確認登録に使うサーバー秘密値のハッシュ。公開しません。
+- `hcf_*` RPC: 認証済みユーザーの権限をDB側で確認してから保存します。
+- 改訂番号の照合、工程参照、工程の並べ替えをトランザクションで保護します。
 
-## 設計と公開
+## 確認
 
-`docs/referent-table.md` に実装前の対象・用語の対応表、`docs/superpowers/` に承認済み設計と実装計画があります。ソースは作業ブランチ `feat/team-site` で管理します。公開はSitesの公式ソース保存・パッケージ・デプロイ手順を使用します。
+```bash
+npm test
+npm run typecheck
+npm run build
+```
+
+実DBでは `supabase/tests/hcf_transactions.sql` を実行し、RLS・権限・競合・参照・並べ替えを確認します。ファイル全体を一度に実行し、末尾のROLLBACKを省略しないでください。
+
+## Vercel
+
+対象GitHubリポジトリは `nomuryo7159/HCF_teamsite`、Vercelのプロジェクト名は `hcf_teamsite` です。Application PresetはNext.js、ビルドは `npm run build`、インストールは `npm ci` を使用します。
+
+VercelのProduction・Preview・Developmentに次の環境変数を設定します。
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `HCF_ENROLLMENT_SECRET`（サーバー専用のランダム値。公開変数にしない）
+
+Previewからも同じDBへの編集を許可するかは、チームの運用に合わせて決めてください。Supabaseの許可済みリダイレクトURLにも対応するURLが必要です。
+
+コードは作業ブランチで変更し、レビュー後にmainへ統合します。環境変数とローカルDB・接続情報はリポジトリへ含めません。

@@ -56,3 +56,6 @@ next-env.d.ts
 /work/
 /.dev.vars
 *.tsbuildinfo
+
+# Editor preferences are local to this workspace.
+/.vscode/

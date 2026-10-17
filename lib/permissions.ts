@@ -1,13 +1,9 @@
-import { env } from 'cloudflare:workers';
-import { getChatGPTUser } from '@/app/chatgpt-auth';
-import { HttpError, normalizeEmail, permissionsFor, requireSameOrigin } from './access';
-export function database():D1Database {if(!env.DB)throw new Error('D1 DB binding is unavailable');return env.DB;}
+import { createSupabaseServerClient } from '@/lib/supabase';
+import { HttpError, requireSameOrigin } from './access';
+import { rpc } from './store';
+export const database=createSupabaseServerClient;
 export async function session(){
- const user=await getChatGPTUser();
- const email=user?normalizeEmail(user.email):null;
- const owner=env.OWNER_EMAIL;
- const editor=email&&owner?await database().prepare('SELECT email FROM editors WHERE email=?').bind(email).first():null;
- return permissionsFor(email,owner,!!editor);
+ return rpc<{signedIn:boolean;isOwner:boolean;canEdit:boolean}>(await database(),'hcf_access_status');
 }
 export async function requirePermission(request:Request,ownerOnly=false){
  requireSameOrigin(request);
@@ -18,7 +14,7 @@ export async function requirePermission(request:Request,ownerOnly=false){
 }
 export async function apiResponse(action:()=>Promise<unknown>){
  try{return Response.json(await action(),{headers:{'Cache-Control':'no-store'}});}catch(error){
- if(error instanceof HttpError)return Response.json({error:error.message},{status:error.status});
+ if(error instanceof HttpError)return Response.json({error:error.message},{status:error.status,headers:{'Cache-Control':'no-store'}});
  console.error('API request failed',error);
  return Response.json({error:'処理に失敗しました。時間をおいて再試行してください'},{status:500});
  }

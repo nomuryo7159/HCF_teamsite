@@ -8,6 +8,6 @@ export async function PATCH(request:Request){
   await requirePermission(request);
   const parsed=input.safeParse(await jsonBody(request));
   if(!parsed.success)throw new HttpError(400,'並び替えるフェーズを確認してください');
-  return {records:await reorderPhases(database(),parsed.data.items)};
+  return {records:await reorderPhases(await database(),parsed.data.items)};
  });
 }
