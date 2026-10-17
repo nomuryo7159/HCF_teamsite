@@ -11,10 +11,14 @@ do $$begin
  begin perform public.hcf_register_identity('hcf-test-only-secret','hcf-test-owner@example.invalid'); raise exception 'password enrollment permitted'; exception when sqlstate 'P0403' then null; end;
 end;$$;
 reset role;
-select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000001","email":"hcf-test-owner@example.invalid","amr":[{"method":"otp"}]}',true);
+select set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000001","email":"hcf-test-owner@example.invalid","amr":[{"method":"magiclink"}]}',true);
 set local role authenticated;
 do $$begin
  begin perform public.hcf_register_identity('wrong','hcf-test-owner@example.invalid'); raise exception 'wrong secret permitted'; exception when sqlstate 'P0403' then null; end;
+ perform public.hcf_register_identity('hcf-test-only-secret','hcf-test-owner@example.invalid');
+ perform set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000001","email":"hcf-test-owner@example.invalid","amr":[{"method":"otp"}]}',true);
+ perform public.hcf_register_identity('hcf-test-only-secret','hcf-test-owner@example.invalid');
+ perform set_config('request.jwt.claims','{"sub":"00000000-0000-0000-0000-000000000001","email":"hcf-test-owner@example.invalid","amr":[{"method":"email/signup"}]}',true);
  perform public.hcf_register_identity('hcf-test-only-secret','hcf-test-owner@example.invalid');
 end;$$;
 reset role;

@@ -12,7 +12,7 @@ Node.js 22.13以上、Next.js 16、React 19、Supabase、Vercel。
 
 1. `npm ci` でパッケージをインストールします。
 2. `.env.example` を `.env.local` にコピーし、利用するSupabaseプロジェクトの公開URLと公開キーを設定します。
-3. 管理者が初回だけ `supabase/migrations/202610170001_hcf_workspace.sql` をSupabaseのSQL Editorで実行します。
+3. 管理者が初回だけ `supabase/migrations/` 内のSQLをファイル名の順にSupabaseのSQL Editorで実行します。
 4. HCF_ENROLLMENT_SECRETのSHA-256ハッシュをhcf_settingsへ登録し、管理者のメールを `public.hcf_editors` に `role='owner'` として登録します。実際のメールアドレスはGitに登録しません。
 5. `npm run dev` で起動し、表示されたURLを開きます（通常 `http://127.0.0.1:5173/`）。
 
