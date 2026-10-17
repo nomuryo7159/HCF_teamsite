@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,readdir} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
 
 test('PostgreSQL migration, RLS and transactional invariants',async()=>{
@@ -21,8 +21,10 @@ test('PostgreSQL migration, RLS and transactional invariants',async()=>{
    grant usage on schema auth to anon,authenticated;
    grant execute on all functions in schema auth to anon,authenticated;
   `);
-  const migration=await readFile(new URL('../supabase/migrations/202610170001_hcf_workspace.sql',import.meta.url),'utf8');
-  await db.exec(migration);
+  const directory=new URL('../supabase/migrations/',import.meta.url);
+  for(const file of (await readdir(directory)).filter(name=>name.endsWith('.sql')).sort()){
+   await db.exec(await readFile(new URL(file,directory),'utf8'));
+  }
   const sql=await readFile(new URL('../supabase/tests/hcf_transactions.sql',import.meta.url),'utf8');
   const results=await db.exec(sql);
   assert.ok(results.some(r=>r.rows.some(row=>(row as {result?:string}).result==='hcf transaction and RLS tests passed')));
