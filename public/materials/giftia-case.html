@@ -1,0 +1,747 @@
+<!doctype html><html lang='ja'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Giftia ケース型開発講義（受講生配布）</title><style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+color:#1F2328;background:#fff;-webkit-font-smoothing:antialiased}
+a{color:#1F6FEB;text-decoration:none}
+.layout{display:flex;min-height:100vh}
+nav{width:280px;flex:none;border-right:1px solid #E3E6EA;padding:32px 20px;position:sticky;top:0;height:100vh;overflow-y:auto;background:#FBFCFD}
+nav .brand{font-size:11px;letter-spacing:.16em;color:#1F6FEB;font-weight:700;margin-bottom:6px}
+nav .title{font-size:15px;font-weight:700;line-height:1.5;margin-bottom:26px}
+nav .grp{font-size:10.5px;letter-spacing:.1em;color:#8A8F98;font-weight:700;margin:20px 0 8px}
+nav a.doc{display:block;padding:7px 10px;border-radius:6px;color:#1F2328;font-size:13.5px;line-height:1.45}
+nav a.doc:hover{background:#F0F4F9}
+nav a.doc.on{background:#1F6FEB;color:#fff;font-weight:700}
+nav .sub{display:block;padding:4px 10px 4px 20px;font-size:12px;color:#57606A;line-height:1.4}
+nav .sub:hover{color:#1F6FEB}
+main{flex:1;min-width:0;display:flex;justify-content:center;padding:56px 48px 120px}
+.page{width:100%;max-width:760px}
+.doc{display:none}
+.doc.on{display:block}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:#1F6FEB;font-weight:700}
+.dochead{font-size:30px;font-weight:700;line-height:1.35;margin:10px 0 8px}
+.docsub{font-size:13.5px;color:#8A8F98;padding-bottom:22px;border-bottom:3px solid #1F6FEB;margin-bottom:34px}
+h1{font-size:21px;font-weight:700;margin:56px 0 18px;padding-bottom:9px;border-bottom:1px solid #E3E6EA;scroll-margin-top:24px}
+h2{font-size:17px;font-weight:700;margin:36px 0 12px;scroll-margin-top:24px}
+h3{font-size:14.5px;font-weight:700;color:#1F6FEB;margin:26px 0 10px}
+h4{font-size:14px;font-weight:700;margin:20px 0 8px}
+p{line-height:1.85;margin:0 0 14px;font-size:14.5px}
+ul,ol{padding-left:22px;margin:0 0 16px;line-height:1.85;font-size:14.5px}
+li{margin-bottom:5px}
+strong{font-weight:700}
+table{width:100%;border-collapse:collapse;margin:16px 0 26px;font-size:13.5px;line-height:1.65}
+th{background:#F2F5F9;text-align:left;padding:10px 12px;border-bottom:2px solid #1F6FEB;font-weight:700;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #E9ECEF;vertical-align:top}
+tbody tr:hover{background:#FBFCFD}
+blockquote{margin:18px 0;padding:14px 20px;background:#F6F8FA;border-left:3px solid #1F6FEB}
+blockquote p{margin:0 0 8px}
+blockquote p:last-child{margin:0}
+code{background:#F2F5F9;padding:2px 5px;border-radius:3px;font-size:13px;color:#24408E;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+pre{background:#F6F8FA;border:1px solid #E9ECEF;border-radius:5px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.65}
+pre code{background:none;padding:0;color:#1F2328}
+hr{border:0;border-top:1px solid #EDF0F3;margin:38px 0}
+@media print{nav{display:none}.doc{display:block!important;page-break-before:always}main{padding:0}}
+@media (max-width:900px){
+ .layout{display:block}
+ nav{width:auto;height:auto;position:static;border-right:0;border-bottom:1px solid #E3E6EA}
+ main{padding:28px 20px 80px}
+}
+</style></head><body><div class='layout'><nav><div class="brand">TECH0</div>
+<div class="title">Giftia ケース型開発講義</div>
+<div class="grp">受講生配布</div>
+<a class="doc" data-t="case" href="#case">ケース本文</a>
+<div class="subs" data-t="case" style="display:none">
+</div>
+<a class="doc" data-t="ex1" href="#ex1">Exhibit 1：主要データ</a>
+<div class="subs" data-t="ex1" style="display:none">
+</div>
+<a class="doc" data-t="ex2" href="#ex2">Exhibit 2：顧客ヒアリング</a>
+<div class="subs" data-t="ex2" style="display:none">
+</div>
+<a class="doc" data-t="ex35" href="#ex35">Exhibit 3-5：現状と開発条件</a>
+<div class="subs" data-t="ex35" style="display:none">
+<a class="sub" href="#ex35-h1">Exhibit 4：現状データベース</a>
+<a class="sub" href="#ex35-h2">Exhibit 5：開発条件</a>
+</div>
+</nav><main><div class='page'><section class="doc" id="case"><div class="eyebrow">受講生配布</div><div class="dochead">ケース本文</div><div class="docsub">01_ケース本文.md</div><p>株式会社Giftiaは、食品、雑貨、コスメ、家電など約8,000点を扱うギフト専門ECサービスを運営している。</p>
+<p>サービス開始から5年。SNS広告や、「誕生日プレゼント特集」「送別ギフト特集」などの記事コンテンツによって利用者を増やしてきた。</p>
+<p>直近1年間のサイト訪問者数は前年比28％増加した。一方、売上の伸びは約8％にとどまり、購入率は前年の3.6％から3.0％に低下した。</p>
+<p>経営会議では、原因について意見が分かれている。</p>
+<p>商品部は、品揃え不足ではないと考えている。取り扱い商品数は3年間で約5,000点から8,000点に増え、カテゴリーや価格帯も拡大してきた。</p>
+<p>マーケティング部は、売れ筋商品の見せ方に改善余地があると考えている。Giftiaでは人気ランキングやシーン別ランキングを提供しており、ランキング上位の商品をトップページで露出すると、その商品の販売数は増える。</p>
+<p>開発部からは、検索機能を強化する案が出ている。現在もカテゴリー、価格、贈るシーンなどから商品を絞り込めるが、「年代」「相手との関係」など、さらに条件を追加できるのではないかという案だ。</p>
+<p>一方、商品部からは商品データそのものについても課題が指摘されている。</p>
+<p>現在の商品データには、価格、カテゴリー、ブランド、商品説明、配送日数、購入者評価などが登録されている。しかし、「職場で渡しやすい」「常温保存できる」「荷物になりにくい」といった情報は、商品によって記載方法が異なっている。</p>
+<p>また、Giftiaでは記事コンテンツ経由の購入も多い。そのため、新たなシステム開発を行うより、「送別で失敗しないギフト10選」といったコンテンツを充実させるべきだという意見もある。</p>
+<p>経営陣は、新たにプロジェクトチームを設置した。</p>
+<p>期間は2か月。2か月後までに要求と要件を固めて経営陣に提案し、要求定義書・要件定義書を開発部（外部の開発メンバーを含む）に引き継ぐ。要求と要件が正しいかを確かめるため、実装は一部でもよいので試す。</p>
+<p>すべての顧客、すべてのギフトシーンに対応する必要はない。</p>
+<p>プロジェクトチームには、<strong>Giftiaが今回優先して解決すべき顧客課題を定義し、その課題を解決するプロダクトを要求・要件として定義し、一部を実装して確かめたうえで提案すること</strong>が求められている。</p>
+<p>プロジェクト初日、社長はメンバーにこう伝えた。</p>
+<blockquote>
+<p>「検索条件を増やすのか、ランキングを変えるのか、商品情報を整えるのか、まったく違う体験を作るのか。私はまだ決めていません。</p>
+<p>ただ、機能の話から始めるのはやめてほしい。</p>
+<p>Giftiaを使っている人たちが、いったい何に困っているのか。私たちはまず、何を解決すべきなのか。</p>
+<p>そこから考えた上で、2か月後までに、何を作るべきかを要求と要件にまとめて提案してください。要求と要件が固まっていれば、実装は一部で構いません。まず動くもので試してみてください」</p>
+</blockquote>
+<hr />
+<h2>添付資料</h2>
+<table>
+<thead>
+<tr>
+<th>資料</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exhibit 1</td>
+<td>Giftiaの主要データ</td>
+</tr>
+<tr>
+<td>Exhibit 2</td>
+<td>顧客ヒアリング記録</td>
+</tr>
+<tr>
+<td>Exhibit 3</td>
+<td>現在のGiftiaの機能</td>
+</tr>
+<tr>
+<td>Exhibit 4</td>
+<td>現状データベース</td>
+</tr>
+<tr>
+<td>Exhibit 5</td>
+<td>開発条件</td>
+</tr>
+</tbody>
+</table></section>
+<section class="doc" id="ex1"><div class="eyebrow">受講生配布</div><div class="dochead">Exhibit 1：主要データ</div><div class="docsub">02_Exhibit1_主要データ.md</div><h2>1. 全体指標</h2>
+<table>
+<thead>
+<tr>
+<th>指標</th>
+<th style="text-align: right;">前年</th>
+<th style="text-align: right;">直近</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>年間セッション数</td>
+<td style="text-align: right;">375万</td>
+<td style="text-align: right;">480万</td>
+</tr>
+<tr>
+<td>年間売上</td>
+<td style="text-align: right;">6.41億円</td>
+<td style="text-align: right;">6.91億円</td>
+</tr>
+<tr>
+<td>購入率</td>
+<td style="text-align: right;">3.6%</td>
+<td style="text-align: right;">3.0%</td>
+</tr>
+<tr>
+<td>平均注文単価</td>
+<td style="text-align: right;">4,750円</td>
+<td style="text-align: right;">4,800円</td>
+</tr>
+<tr>
+<td>1セッション当たり商品詳細閲覧数</td>
+<td style="text-align: right;">6.2</td>
+<td style="text-align: right;">9.4</td>
+</tr>
+<tr>
+<td>商品詳細→カート投入率</td>
+<td style="text-align: right;">12%</td>
+<td style="text-align: right;">8%</td>
+</tr>
+<tr>
+<td>カート放棄率</td>
+<td style="text-align: right;">34%</td>
+<td style="text-align: right;">41%</td>
+</tr>
+<tr>
+<td>初回訪問から購入までの平均日数</td>
+<td style="text-align: right;">1.8日</td>
+<td style="text-align: right;">3.1日</td>
+</tr>
+<tr>
+<td>複数セッションを経て購入した比率</td>
+<td style="text-align: right;">38%</td>
+<td style="text-align: right;">56%</td>
+</tr>
+<tr>
+<td>検索結果0件率</td>
+<td style="text-align: right;">2.3%</td>
+<td style="text-align: right;">2.1%</td>
+</tr>
+<tr>
+<td>返品・交換率</td>
+<td style="text-align: right;">1.3%</td>
+<td style="text-align: right;">1.2%</td>
+</tr>
+</tbody>
+</table>
+<p>※購入率はセッションベース。</p>
+<hr />
+<h2>2. 主なギフトシーン別（直近1年）</h2>
+<table>
+<thead>
+<tr>
+<th>シーン</th>
+<th style="text-align: right;">セッション構成比</th>
+<th style="text-align: right;">購入率</th>
+<th style="text-align: right;">平均注文単価</th>
+<th style="text-align: right;">平均閲覧商品数</th>
+<th style="text-align: right;">購入までの日数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>送別</td>
+<td style="text-align: right;">18%</td>
+<td style="text-align: right;">1.7%</td>
+<td style="text-align: right;">5,200円</td>
+<td style="text-align: right;">16.5</td>
+<td style="text-align: right;">5.3日</td>
+</tr>
+<tr>
+<td>友人への誕生日</td>
+<td style="text-align: right;">29%</td>
+<td style="text-align: right;">2.8%</td>
+<td style="text-align: right;">4,600円</td>
+<td style="text-align: right;">9.2</td>
+<td style="text-align: right;">3.1日</td>
+</tr>
+<tr>
+<td>家族への誕生日</td>
+<td style="text-align: right;">24%</td>
+<td style="text-align: right;">2.3%</td>
+<td style="text-align: right;">5,400円</td>
+<td style="text-align: right;">10.8</td>
+<td style="text-align: right;">3.8日</td>
+</tr>
+<tr>
+<td>ビジネスのお礼</td>
+<td style="text-align: right;">11%</td>
+<td style="text-align: right;">4.0%</td>
+<td style="text-align: right;">4,900円</td>
+<td style="text-align: right;">5.5</td>
+<td style="text-align: right;">1.5日</td>
+</tr>
+<tr>
+<td>毎年決まった相手への贈答</td>
+<td style="text-align: right;">18%</td>
+<td style="text-align: right;">5.0%</td>
+<td style="text-align: right;">4,400円</td>
+<td style="text-align: right;">3.4</td>
+<td style="text-align: right;">0.9日</td>
+</tr>
+</tbody>
+</table>
+<p>※シーンは、購入時に選択されたギフト用途タグと検索キーワードから推定した分類。</p>
+<hr />
+<h2>3. 流入経路別（外部からの流入）</h2>
+<table>
+<thead>
+<tr>
+<th>流入経路</th>
+<th style="text-align: right;">前年セッション構成比</th>
+<th style="text-align: right;">直近セッション構成比</th>
+<th style="text-align: right;">前年購入率</th>
+<th style="text-align: right;">直近購入率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SNS広告</td>
+<td style="text-align: right;">22%</td>
+<td style="text-align: right;">34%</td>
+<td style="text-align: right;">2.4%</td>
+<td style="text-align: right;">2.0%</td>
+</tr>
+<tr>
+<td>記事コンテンツ</td>
+<td style="text-align: right;">31%</td>
+<td style="text-align: right;">26%</td>
+<td style="text-align: right;">4.2%</td>
+<td style="text-align: right;">3.9%</td>
+</tr>
+<tr>
+<td>自然検索</td>
+<td style="text-align: right;">33%</td>
+<td style="text-align: right;">28%</td>
+<td style="text-align: right;">3.3%</td>
+<td style="text-align: right;">2.9%</td>
+</tr>
+<tr>
+<td>直接・リピート</td>
+<td style="text-align: right;">14%</td>
+<td style="text-align: right;">12%</td>
+<td style="text-align: right;">4.8%</td>
+<td style="text-align: right;">4.6%</td>
+</tr>
+<tr>
+<td>全体</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">3.6%</td>
+<td style="text-align: right;">3.0%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>4. サイト内回遊導線別（直近1年）</h2>
+<table>
+<thead>
+<tr>
+<th>導線</th>
+<th style="text-align: right;">その導線に接触したセッションの購入率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>検索結果ページ</td>
+<td style="text-align: right;">2.4%</td>
+</tr>
+<tr>
+<td>人気ランキング</td>
+<td style="text-align: right;">3.8%</td>
+</tr>
+<tr>
+<td>特集記事</td>
+<td style="text-align: right;">4.1%</td>
+</tr>
+</tbody>
+</table>
+<p>※1セッションが複数の導線に接触するため、構成比は合計しない。</p>
+<hr />
+<h2>5. カスタマーサポート問い合わせ分類（直近1年）</h2>
+<table>
+<thead>
+<tr>
+<th>問い合わせ内容</th>
+<th style="text-align: right;">構成比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>商品の選択・用途について</td>
+<td style="text-align: right;">31%</td>
+</tr>
+<tr>
+<td>配送・ラッピング</td>
+<td style="text-align: right;">28%</td>
+</tr>
+<tr>
+<td>在庫・納期</td>
+<td style="text-align: right;">12%</td>
+</tr>
+<tr>
+<td>返品・交換</td>
+<td style="text-align: right;">6%</td>
+</tr>
+<tr>
+<td>商品が見つからない</td>
+<td style="text-align: right;">4%</td>
+</tr>
+<tr>
+<td>その他</td>
+<td style="text-align: right;">19%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6. 記事コンテンツの制作状況</h2>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th style="text-align: right;">値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公開中の記事本数</td>
+<td style="text-align: right;">約120本</td>
+</tr>
+<tr>
+<td>記事1本あたりの制作工数</td>
+<td style="text-align: right;">約3人日</td>
+</tr>
+<tr>
+<td>記事制作に割ける工数</td>
+<td style="text-align: right;">月10人日程度</td>
+</tr>
+</tbody>
+</table>
+<p>Giftiaが記事の企画時に想定している顧客の状況は、「贈るシーン（5）× 相手との関係（6）× 予算帯（5）」で150通りある。</p>
+<p>現在の記事がカバーしているのは、このうち約40通り。1組み合わせあたり平均3本の記事がある。残りの組み合わせで訪問した顧客は、検索結果ページに流れている。</p></section>
+<section class="doc" id="ex2"><div class="eyebrow">受講生配布</div><div class="dochead">Exhibit 2：顧客ヒアリング</div><div class="docsub">03_Exhibit2_顧客ヒアリング.md</div><p>Giftiaの利用者5名に、直近のギフト購入について聞き取りを行った記録である。</p>
+<hr />
+<h2>Aさん：職場の先輩への送別品</h2>
+<p>Aさんは、3年間同じ部署で働いた40代女性の先輩が異動することになり、同僚3人でプレゼントを贈ることになった。</p>
+<p>3人で1,500円ずつ出し、4,500円前後の商品を想定していた。</p>
+<p>「プレゼントって、人気のものから選ぶのが一番安心かなと思うんです。変なものを選びたくないので」</p>
+<p>先輩とは毎日仕事をしていたが、休日に会うほど親しくはない。</p>
+<p>「コーヒーをよく飲んでいるのは知っています。でも、どんなコーヒーが好きかまでは知らないですね」</p>
+<p>Aさんは「40代 女性 送別 プレゼント」で検索し、送別ギフトランキングを確認した。</p>
+<p>1位のハンドクリームは価格もレビューも条件に合っていたが、購入しなかった。</p>
+<p>「香りが好みじゃなかったら嫌だなと思って」</p>
+<p>2位の焼き菓子も検討した。</p>
+<p>「甘いものが好きだったかな、と。毎日一緒にいるのに意外と知らないんですよね」</p>
+<p>30分ほどで10商品以上を見たあと、一度サイトを閉じた。</p>
+<p>「年代とか予算とか関係性とかを入れたら、もう少し絞ってくれたら便利だと思います。商品がいっぱい出てくると、途中から分からなくなります」</p>
+<p>その夜、Aさんは再びGiftiaを開き、3商品まで絞った。そして同僚2人とのLINEグループにリンクを送った。</p>
+<p>「この3つならどれがいい？」</p>
+<p>一人がタオルセットについて「これなら先輩っぽいし、変じゃないと思う」と返信し、もう一人も賛成したため、その商品を購入した。</p>
+<p>最終的な決め手を尋ねると、</p>
+<p>「価格とかレビューも見ましたけど……二人が『それならいいと思う』と言ってくれたのは大きかったです。自分で決めて、あとで『なんでこれにしたの？』ってなるのが嫌だったので」</p>
+<p>と答えた。</p>
+<p>それでもGiftiaに欲しい機能を尋ねると、</p>
+<p>「条件を入れたら人気商品を何個か出してくれる機能ですかね」</p>
+<p>と答えた。</p>
+<hr />
+<h2>Bさん：学生時代からの友人への誕生日</h2>
+<p>Bさんは、10年以上付き合いのある友人への誕生日プレゼントを探していた。</p>
+<p>「毎年なので、だいたい5,000円までと決めています。予算で絞れるのが一番大事ですね」</p>
+<p>友人の好みは比較的よく知っている。</p>
+<p>「シンプルなものより、ちょっと変わったものが好き。SNSで面白いものを見つけるとすぐ送ってくるような子です」</p>
+<p>Giftiaで3,000〜5,000円に絞り、約30商品を見たが購入しなかった。</p>
+<p>「人気ランキングも見ました。でも『今年の人気ギフト1位』みたいなのを見ると、友達にあげるには逆に普通すぎるなと思ってしまって。もちろん、人気がある方が安心なんですけどね」</p>
+<p>翌日の昼休み、Instagramで少し変わったデザインの卓上ライトを見つけた。価格は5,800円だった。</p>
+<p>「絶対あの子が好きそうだと思って。部屋に置いて『これ私っぽい』って笑ってるところが想像できたんですよね」</p>
+<p>Giftiaにも同じ商品があったため、そこで購入した。</p>
+<p>5,000円を超えていることを尋ねると、</p>
+<p>「800円くらいなら誤差ですよ。せっかくなら喜んでほしいので」</p>
+<p>と答えた。</p>
+<hr />
+<h2>Cさん：取引先担当者へのお礼</h2>
+<p>Cさんは、半年間のプロジェクト終了時に、取引先の担当者へ個人的にお礼を贈ろうとしていた。</p>
+<p>「相手の好みに合うものをおすすめしてもらえると、一番いいですよね」</p>
+<p>しかし、担当者の趣味、酒を飲むかどうか、家族構成などは知らなかった。</p>
+<p>Giftiaで「取引先 お礼」「ビジネス ギフト」と検索しながら、</p>
+<ul>
+<li>会社宛てに配送できるか</li>
+<li>常温で置いておけるか</li>
+<li>個包装か</li>
+<li>賞味期限は十分あるか</li>
+</ul>
+<p>を何度も確認していた。</p>
+<p>最終的に、有名店の個包装の焼き菓子を購入した。</p>
+<p>「担当者が甘いものを好きかどうかは分かりません。でも、これなら受け取って困ることはないかなと思って」</p>
+<p>「最初は相手の好みに合わせたいと言っていましたね」と尋ねると、</p>
+<p>「そうですね……。好みが分かればもちろんいいですけど、仕事の相手なら、たぶん“外さないこと”の方が大事かもしれないですね」</p>
+<p>と答えた。</p>
+<hr />
+<h2>Dさん：母親への誕生日</h2>
+<p>Dさんは、65歳になる母親への誕生日プレゼントを探していた。</p>
+<p>「母くらいの年代で人気のものが分かると助かります。同世代の人が何をもらって喜んでいるのか、私は分からないので」</p>
+<p>前年は服を贈ったが、サイズが合わず、その後着ているところを見ていない。</p>
+<p>Dさんは「60代 女性 誕生日 人気」で検索したが、ランキング上位の商品を見ても決められず、その日は購入しなかった。</p>
+<p>数日後、以前母親が「こういうの便利そうね」と話していたことを思い出し、小型の電気ケトルを購入した。</p>
+<p>「ランキングには入っていませんでした。でも、これなら使ってくれるかなと思って」</p>
+<p>「最初は年代別の人気が知りたいと言っていましたね」と尋ねると、</p>
+<p>「何も手掛かりがないから、まず人気を見るんです。でも去年使ってもらえなかったので、今年は“本当に使うかな”っていう方が気になったのかもしれません」</p>
+<p>と答えた。</p>
+<hr />
+<h2>Eさん：毎年の定型的な贈答</h2>
+<p>Eさんは、毎年お中元とお歳暮の時期に、親族や恩人あわせて3〜4件の贈答をしている。</p>
+<p>「もう10年くらい、贈る相手も中身もだいたい同じです。叔父にはビールセット、恩師には調味料の詰め合わせ。相手も毎年『ありがとう』と言ってくれるし、変える理由もないですね」</p>
+<p>1件あたりの予算は4,000〜5,000円程度。年間では2万円近くになる。</p>
+<p>Giftiaでは前年の注文履歴を開き、同じ商品をそのまま購入した。商品を比較したり、ランキングを見たりすることはなかった。</p>
+<p>「選ぶ時間はかけたくないですね。去年と同じものが、期日までに確実に届けばそれで十分です」</p>
+<p>「新しい商品を提案してもらえたら嬉しいですか」と尋ねると、</p>
+<p>「うーん、いらないですね。むしろ毎年違うものを贈る方が、相手も『何かあったのかな』と思うかもしれないので」</p>
+<p>と答えた。</p></section>
+<section class="doc" id="ex35"><div class="eyebrow">受講生配布</div><div class="dochead">Exhibit 3-5：現状と開発条件</div><div class="docsub">04_Exhibit3-5_サービス現状と開発条件.md</div><h2>検索・絞り込み</h2>
+<table>
+<thead>
+<tr>
+<th>機能</th>
+<th>現状</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>キーワード検索</td>
+<td>商品名、ブランド、「送別 お菓子」等</td>
+</tr>
+<tr>
+<td>カテゴリー</td>
+<td>食品、雑貨、コスメ、家電 等</td>
+</tr>
+<tr>
+<td>価格帯</td>
+<td>〜3,000円、3,000〜5,000円 等</td>
+</tr>
+<tr>
+<td>贈るシーン</td>
+<td>誕生日、結婚祝い、送別、お礼 等</td>
+</tr>
+<tr>
+<td>配送</td>
+<td>翌日配送、日時指定 等</td>
+</tr>
+<tr>
+<td>ギフト対応</td>
+<td>ラッピング、メッセージカード</td>
+</tr>
+<tr>
+<td>並べ替え</td>
+<td>おすすめ、人気、評価、価格、新着</td>
+</tr>
+<tr>
+<td>コンテンツ</td>
+<td>「40代女性に喜ばれるプレゼント10選」等の特集記事</td>
+</tr>
+</tbody>
+</table>
+<p>「おすすめ順」は、キーワード一致度、販売実績、レビュー評価などを組み合わせて決定している。</p>
+<p>「人気順」とシーン別ランキングは、直近1年の販売数の多い順に並べたものである。シーン別ランキングは、そのシーンのタグ（Exhibit 4 の <code>product_scenes</code>）が付いた商品だけを対象にしている。</p>
+<h2>検索結果の件数（例）</h2>
+<table>
+<thead>
+<tr>
+<th>検索条件</th>
+<th style="text-align: right;">該当件数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「40代 女性 送別 プレゼント」</td>
+<td style="text-align: right;">約180件</td>
+</tr>
+<tr>
+<td>上記 ＋ 価格3,000〜5,000円</td>
+<td style="text-align: right;">約70件</td>
+</tr>
+</tbody>
+</table>
+<h2>現在は存在しない絞り込み条件</h2>
+<ul>
+<li>相手との関係性</li>
+<li>親しさ</li>
+<li>相手の好みをどの程度知っているか</li>
+<li>無難／個性的</li>
+<li>気を遣わせたくない</li>
+<li>職場で受け取って困らない</li>
+</ul>
+<hr />
+<h1 id="ex35-h1">Exhibit 4：Giftiaの現状データベース</h1>
+<p>Giftiaの本番環境には、約8,000商品と、会員・注文・レビューのデータがある。</p>
+<p>演習では、本番と同じ規模の<strong>ダミーデータ（商品8,000件・会員約10万人・過去2年分の注文約28万件）</strong>を使う。データは、班ごとに用意した開発用のデータベース（MySQL）として、1週目に接続の方法とあわせて渡す。テーブルの定義、ER図、カラムの説明も同時に渡す。</p>
+<h2>テーブルの一覧</h2>
+<table>
+<thead>
+<tr>
+<th>テーブル</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>products（商品）</td>
+<td>約8,000件。下の「商品の既存カラム」</td>
+</tr>
+<tr>
+<td>product_scenes（贈るシーンのタグ）</td>
+<td>商品ごとに1〜4個。誕生日、結婚祝い、出産祝い、送別、お礼、お中元、お歳暮、父の日、母の日。マーケティング部が商品登録時に付けたもので、Exhibit 3 の「贈るシーン」の絞り込みとシーン別ランキングに使われている。<strong>相手との関係や好みの情報は含まない</strong></td>
+</tr>
+<tr>
+<td>users（会員）</td>
+<td>約10万人。年代・性別・会員登録日などを持つ</td>
+</tr>
+<tr>
+<td>orders（注文）</td>
+<td>直近2年分・約28万件。誰が・いつ・どの用途タグを選んで・どの送り先へ注文したか。送り先は匿名のキーで表し、同じ会員が同じ相手に送ると同じ値になる。自宅宛て／会社宛ての区別がある</td>
+</tr>
+<tr>
+<td>order_items（注文明細）</td>
+<td>注文ごとの商品・数量・購入時の単価</td>
+</tr>
+<tr>
+<td>reviews（レビュー）</td>
+<td>約2.5万件。星（1〜5）と投稿日。本文があるのは約3割で、残りは星だけ</td>
+</tr>
+</tbody>
+</table>
+<p>注文の <code>estimated_scene</code> は、購入時に選ばれた用途タグと検索キーワードから<strong>分析部門が推定したシーン</strong>で、Exhibit 1 のシーン別の数字はこの値で集計している。推定値なので、用途タグと合わない注文もある。用途タグは任意入力のため、選ばれていない注文もある。</p>
+<h2>商品の既存カラム</h2>
+<table>
+<thead>
+<tr>
+<th>カラム</th>
+<th>例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>product_id</td>
+<td>G0001</td>
+</tr>
+<tr>
+<td>product_name</td>
+<td>Lino 国産タオルギフトセット</td>
+</tr>
+<tr>
+<td>category</td>
+<td>生活雑貨</td>
+</tr>
+<tr>
+<td>price</td>
+<td>4,400</td>
+</tr>
+<tr>
+<td>brand</td>
+<td>Lino</td>
+</tr>
+<tr>
+<td>description</td>
+<td>上質な国産タオルを…</td>
+</tr>
+<tr>
+<td>size</td>
+<td>フェイスタオル×2</td>
+</tr>
+<tr>
+<td>delivery_days</td>
+<td>2</td>
+</tr>
+<tr>
+<td>gift_wrap</td>
+<td>○</td>
+</tr>
+<tr>
+<td>message_card</td>
+<td>○</td>
+</tr>
+<tr>
+<td>rating</td>
+<td>4.4</td>
+</tr>
+<tr>
+<td>review_count</td>
+<td>13</td>
+</tr>
+<tr>
+<td>sales_count（直近1年の販売数）</td>
+<td>72</td>
+</tr>
+<tr>
+<td>stock</td>
+<td>82</td>
+</tr>
+<tr>
+<td>registered_at（商品の登録日）</td>
+<td>2021-07-01</td>
+</tr>
+</tbody>
+</table>
+<p>商品には、タオル、ハンドクリーム、焼き菓子、コーヒー、卓上ライト、電気ケトル、紅茶、ディフューザー、名刺入れ、フラワーボックス、調味料、カタログギフトなどが含まれる。</p>
+<p>ブランド名・店名・商品名はすべて架空のもので、実在の企業・店舗・商品とは関係ない。商品画像はGiftiaの画像配信の仕組みで管理しており、今回配布するデータベースには含まれない。</p>
+<h2>構造化されていない情報</h2>
+<p>以下のような情報は、商品説明文に書かれている場合もあれば、書かれていない場合もあり、検索や絞り込みには使えない。書かれている場合も、書き方は商品ごとにばらばらである。</p>
+<ul>
+<li>職場で渡しやすい</li>
+<li>好みが分からない相手にも選びやすい</li>
+<li>個性的／無難</li>
+<li>気を遣わせにくい</li>
+<li>実用的</li>
+<li>みんなで分けられる</li>
+<li>常温で保存できる</li>
+<li>個包装かどうか</li>
+<li>日持ち（賞味期限）</li>
+<li>香りの有無・強さ</li>
+<li>荷物になりにくい</li>
+</ul>
+<p>レビューの本文には、購入者が実際に使った・贈ったあとの声が書かれていることがある。</p>
+<h2>新しいデータの追加について</h2>
+<p>必要と判断すれば、新しいカラムやテーブル、タグを設計・追加してよい。商品に持たせるか、会員や送り先の側に持たせるかも含めて設計すること。</p>
+<p>ただし、追加する場合は以下を必ず設計すること。</p>
+<blockquote>
+<p><strong>そのデータを、誰が・どうやって付与し、新商品が追加されたときにどう更新するのか。年間でどれだけの工数がかかるのか。</strong></p>
+</blockquote>
+<p>8,000件すべてに手作業で付与する必要はない。一部への付与、ルール化、説明文・レビューからの推定、生成AIの利用などを含め、「新商品が増え続ける本番でどう運用するか」まで考えること。</p>
+<hr />
+<h1 id="ex35-h2">Exhibit 5：開発条件</h1>
+<h2>期間と技術</h2>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>期間</td>
+<td>2か月（要求・要件を固めて提案する。実装は一部でよい）</td>
+</tr>
+<tr>
+<td>引き継ぎ先</td>
+<td>開発部（外部の開発メンバーを含む）。要求定義書・要件定義書で引き継ぐ</td>
+</tr>
+<tr>
+<td>フロントエンド</td>
+<td>Next.js</td>
+</tr>
+<tr>
+<td>バックエンド</td>
+<td>FastAPI</td>
+</tr>
+<tr>
+<td>データベース</td>
+<td>Exhibit 4 の現状データベース（チームで追加したデータを含む）</td>
+</tr>
+</tbody>
+</table>
+<h2>プロダクトに必ず含める処理</h2>
+<p><strong>ユーザーから何らかの入力を受ける
+→ 商品DBから複数の候補を取得する
+→ チームが設計したロジックで順位付けする
+→ 結果を返す</strong></p>
+<h2>社内リソースの制約</h2>
+<table>
+<thead>
+<tr>
+<th>部署</th>
+<th>割ける工数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>商品部（商品データ整備）</td>
+<td>月5人日程度</td>
+</tr>
+<tr>
+<td>編集チーム（記事制作）</td>
+<td>月10人日程度</td>
+</tr>
+</tbody>
+</table>
+<h2>今回の対象外</h2>
+<ul>
+<li>決済</li>
+<li>実際の配送</li>
+<li>本番公開</li>
+<li>8,000商品すべてへのデータ付与</li>
+</ul>
+<h2>前提</h2>
+<p>すべての顧客・すべてのギフトシーンを解決する必要はない。</p>
+<p><strong>誰の、どのような状況における課題を解くのかを絞ること。</strong></p></section>
+</div></main></div><script>
+function show(id){
+  document.querySelectorAll('.doc').forEach(function(d){d.classList.toggle('on',d.id===id)});
+  document.querySelectorAll('nav a.doc').forEach(function(a){a.classList.toggle('on',a.dataset.t===id)});
+  document.querySelectorAll('nav .subs').forEach(function(s){s.style.display=(s.dataset.t===id?'block':'none')});
+  window.scrollTo(0,0);
+  history.replaceState(null,'','#'+id);
+}
+document.querySelectorAll('nav a.doc').forEach(function(a){
+  a.addEventListener('click',function(e){e.preventDefault();show(a.dataset.t)});
+});
+var init=(location.hash||'').replace('#','');
+show(document.getElementById(init)?init:'case');
+</script></body></html>
