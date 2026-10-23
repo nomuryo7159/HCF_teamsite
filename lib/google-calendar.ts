@@ -1,14 +1,9 @@
 // Parses a Google Calendar iCal feed into site events (dates and times in Asia/Tokyo).
+// The site is public, so only titles and times are kept: descriptions, locations
+// and links (including Google Meet joining details) never leave the server.
 export type CalendarEvent = {
   id: string;
-  data: {
-    title: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-    description: string;
-    url?: string;
-  };
+  data: { title: string; date: string; startTime: string; endTime: string };
 };
 type Prop = { name: string; params: Record<string, string>; value: string };
 type Stamp = { wall: number; zone: string; allDay: boolean }; // wall: wall-clock time in `zone`, encoded as a UTC epoch
@@ -274,23 +269,11 @@ export function parseIcs(
     const dtend = r.get("DTEND");
     const end = dtend ? stamp(dtend.value, dtend.params) : null;
     const uid = r.get("UID")?.value ?? "";
-    // The site is public: private events only show that the time is taken.
+    // Private events only show that the time is taken.
     // A modified occurrence without its own CLASS inherits the series' CLASS.
     const hidden = ["PRIVATE", "CONFIDENTIAL"].includes(
       classOf(r) ?? seriesClass.get(uid) ?? "",
     );
-    const location = hidden ? "" : unescape(r.get("LOCATION")?.value ?? "");
-    const description = hidden
-      ? ""
-      : [
-          location && `場所：${location}`,
-          unescape(r.get("DESCRIPTION")?.value ?? ""),
-        ]
-          .filter(Boolean)
-          .join("\n")
-          .slice(0, 20000);
-    const link = hidden ? "" : (r.get("URL")?.value.trim() ?? "");
-    const url = /^https?:\/\//i.test(link) ? link : undefined;
     const title = hidden
       ? "予定あり"
       : unescape(r.get("SUMMARY")?.value ?? "")
@@ -316,8 +299,6 @@ export function parseIcs(
               date: isoDate(s.wall + d * DAY),
               startTime: "",
               endTime: "",
-              description,
-              url,
             },
           });
       } else {
@@ -337,8 +318,6 @@ export function parseIcs(
             date: at.date,
             startTime: at.time,
             endTime,
-            description,
-            url,
           },
         });
       }
