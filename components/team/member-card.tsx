@@ -2,6 +2,12 @@ import { ArrowUpRight, Plus } from "lucide-react";
 import { type Entry } from "./types";
 import { Edit } from "./common";
 
+// Photos live in public/members/. Keyed by record id (Shun's record id is "pending").
+const photos: Record<string, string> = {
+  nomurin: "/members/nomurin.jpg",
+  pending: "/members/shun.jpg",
+};
+
 const profileRows = [
   ["mbti", "MBTI"],
   ["focus", "注力"],
@@ -33,7 +39,14 @@ export default function MemberCard({
         {onEdit && <Edit label={d.name} onClick={onEdit} />}
       </div>
       <div className="avatar">
-        {pending ? <Plus size={36} strokeWidth={1.4} /> : d.name.slice(0, 1)}
+        {pending ? (
+          <Plus size={36} strokeWidth={1.4} />
+        ) : photos[member.id] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={photos[member.id]} alt={d.name + "の写真"} width={96} height={96} />
+        ) : (
+          d.name.slice(0, 1)
+        )}
       </div>
       <h4>
         {d.name}
