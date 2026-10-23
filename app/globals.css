@@ -78,3 +78,4 @@ select,input,textarea{background:#fffefb;border-color:#d7e0cb;color:#324a36}.sea
 .member-link{display:inline-flex;align-items:center;gap:5px;margin-top:16px;font-size:12px;font-weight:600;color:#527c42}
 .member-link:hover{color:#96701f}
 @media(max-width:700px){.member-card.profile-card{display:flex;padding:18px 20px 22px}.profile-card h4{align-self:center;font-size:17px}.profile-card .avatar{width:80px;height:80px;font-size:34px;margin:6px 0 14px}.profile-card .member-bio{font-size:11px}}
+.calendar-event.is-google{background:#fbf1e6;color:#b07a3f}.event-source{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:999px;background:#fbf1e6;color:#b07a3f;font-size:9px;vertical-align:middle}.calendar-panel>.error-box{margin-bottom:12px}
