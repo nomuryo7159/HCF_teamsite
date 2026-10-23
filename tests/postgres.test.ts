@@ -34,3 +34,22 @@ test('PostgreSQL migration, RLS and transactional invariants',async()=>{
   assert.equal(editors.rows[0].count,0,'fixture editor emails were rolled back');
  }finally{await db.close()}
 });
+
+test('member profile fields are accepted and still validated',async()=>{
+ const db=new PGlite();
+ try{
+  await db.exec(`create role anon; create role authenticated; create schema auth;
+   create function auth.jwt() returns jsonb language sql stable as $$ select '{}'::jsonb $$;
+   create function auth.uid() returns uuid language sql stable as $$ select null::uuid $$;`);
+  const directory=new URL('../supabase/migrations/',import.meta.url);
+  for(const file of (await readdir(directory)).filter(name=>name.endsWith('.sql')).sort())await db.exec(await readFile(new URL(file,directory),'utf8'));
+  const check=(data:object)=>db.query('select public.hcf_validate_data($1,$2::jsonb)',['member',JSON.stringify(data)]);
+  const base={name:'のむりん',role:'',bio:'',status:'active'};
+  await check(base);
+  await check({...base,tags:['🚃 ローカル線'],mbti:'INTP-A',focus:'x',schedule:'朝型',values:'y',url:'https://example.com'});
+  await assert.rejects(check({...base,url:'javascript:alert(1)'}));
+  await assert.rejects(check({...base,tags:'not-array'}));
+  await assert.rejects(check({...base,mbti:'x'.repeat(201)}));
+  await assert.rejects(check({...base,unknown:'x'}));
+ }finally{await db.close()}
+});

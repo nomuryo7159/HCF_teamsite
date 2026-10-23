@@ -13,7 +13,7 @@ export default function Editor({editing,records,onSave,onDelete,onClose}:{editin
  const url:Field={name:'url',label:'リンク先URL',type:'url'};
  const fields:Record<Kind,Field[]>={
  team:[{name:'name',label:'チーム名',required:true},{name:'mission',label:'チームの目的',type:'textarea',required:true}],
- member:[{name:'name',label:'表示名',required:true},{name:'role',label:'役割・担当'},{name:'bio',label:'自己紹介',type:'textarea'},{name:'status',label:'参加状況',type:'select',options:[{value:'active',label:'参加中'},{value:'pending',label:'参加予定'}]}],
+ member:[{name:'name',label:'表示名',required:true},{name:'role',label:'肩書き・担当（例：IT法務・コンプラ）'},{name:'tags',label:'趣味タグ（カンマ区切り・絵文字可。例：🚃 ローカル線, 🐕 保護犬）'},{name:'mbti',label:'MBTI'},{name:'focus',label:'注力'},{name:'schedule',label:'時間（活動しやすい時間帯）'},{name:'values',label:'価値観'},{name:'bio',label:'ひとこと・自己紹介',type:'textarea'},{name:'url',label:'自己紹介ページのURL',type:'url'},{name:'status',label:'参加状況',type:'select',options:[{value:'active',label:'参加中'},{value:'pending',label:'参加予定'}]}],
  rule:[title,{name:'body',label:'内容',type:'textarea'}],
  phase:[title,assignee,{name:'startDate',label:'開始日',type:'date'},{name:'endDate',label:'終了日',type:'date'}],
  task:[title,assignee,{name:'phaseId',label:'工程',type:'select',options:[{value:'',label:'工程なし'},...records.filter(r=>r.kind==='phase').map(r=>({value:r.id,label:r.data.title}))]},{name:'dueDate',label:'期限',type:'date'},{name:'completed',label:'完了',type:'checkbox'}],
