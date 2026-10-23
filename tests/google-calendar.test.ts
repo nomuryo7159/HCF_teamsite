@@ -26,8 +26,6 @@ test("converts timed events to Tokyo date and time", () => {
     date: "2026-11-02",
     startTime: "00:00",
     endTime: "01:00",
-    description: "場所：Zoom\n議題\n共有",
-    url: undefined,
   });
 });
 test("reads TZID times and folded lines", () => {
@@ -129,29 +127,21 @@ test("limits recurrences to the requested window and skips cancelled events", ()
     ["2026-11-01", "2026-11-02", "2026-11-03"],
   );
 });
-test("keeps only http links", () => {
+test("never exposes descriptions, locations, or links", () => {
   const events = parseIcs(
-    ics(
-      [
-        "UID:h",
-        "DTSTART:20261101T000000Z",
-        "URL:javascript:alert(1)",
-        "SUMMARY:A",
-      ],
-      [
-        "UID:i",
-        "DTSTART:20261101T000000Z",
-        "URL:https://example.com/x",
-        "SUMMARY:B",
-      ],
-    ),
+    ics([
+      "UID:m",
+      "DTSTART:20261101T000000Z",
+      "SUMMARY:定例",
+      "LOCATION:会議室",
+      "DESCRIPTION:Join with Google Meet: https://meet.google.com/abc-defg-hij\\nPIN: 123",
+      "URL:https://example.com/x",
+    ]),
     "2026-10-01",
     "2026-12-31",
   );
-  assert.deepEqual(
-    events.map((e) => e.data.url),
-    [undefined, "https://example.com/x"],
-  );
+  assert.deepEqual(Object.keys(events[0].data).sort(), ["date", "endTime", "startTime", "title"]);
+  assert.equal(JSON.stringify(events).includes("meet.google.com"), false);
 });
 test("hides details of private and confidential events", () => {
   const events = parseIcs(
@@ -164,8 +154,8 @@ test("hides details of private and confidential events", () => {
     "2026-12-31",
   );
   assert.deepEqual(
-    events.map((e) => [e.data.title, e.data.description, e.data.url]),
-    [["予定あり", "", undefined], ["予定あり", "", undefined], ["定例", "", undefined]],
+    events.map((e) => e.data.title),
+    ["予定あり", "予定あり", "定例"],
   );
 });
 test("modified occurrences of a private series stay hidden", () => {
@@ -178,7 +168,7 @@ test("modified occurrences of a private series stay hidden", () => {
     "2026-12-31",
   );
   assert.deepEqual(
-    events.map((e) => [e.data.date, e.data.title, e.data.description]).sort(),
-    [["2026-11-02", "予定あり", ""], ["2026-11-10", "予定あり", ""]],
+    events.map((e) => [e.data.date, e.data.title]).sort(),
+    [["2026-11-02", "予定あり"], ["2026-11-10", "予定あり"]],
   );
 });

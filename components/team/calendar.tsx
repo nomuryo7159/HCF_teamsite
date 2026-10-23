@@ -4,7 +4,11 @@ import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { type Entry, type Editing, today, dateLabel } from "./types";
 import { Empty, External, Edit, Add } from "./common";
 import type { CalendarEvent } from "@/lib/google-calendar";
-type Item = CalendarEvent & { entry?: Entry<"event"> };
+type Item = {
+  id: string;
+  data: CalendarEvent["data"] & { description?: string; url?: string };
+  entry?: Entry<"event">;
+};
 export default function Calendar({
   events,
   googleEvents,
