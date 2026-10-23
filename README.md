@@ -60,6 +60,12 @@ npm run build
 
 実DBでは `supabase/tests/hcf_transactions.sql` を実行し、RLS・権限・競合・参照・並べ替えを確認します。ファイル全体を一度に実行し、末尾のROLLBACKを省略しないでください。
 
+## Google カレンダー連携
+
+カレンダーには、サイトで登録した予定に加えて、Google カレンダー「チーム健康第一」の予定を「Google」ラベル付きで表示します。同期は Google → サイトの片方向です。Google の予定の追加・変更は Google カレンダー側で行い、サイト上では編集できません。
+
+`/api/calendar` が `GOOGLE_CALENDAR_ICS_URL` の iCal を取得し、前後1年分を日本時間に変換して返します（最大5分キャッシュ）。繰り返し予定・除外日・個別に変更した回に対応します。変数が未設定ならサイトの予定だけを表示します。非公開アドレスが漏れたときは Google カレンダーで再発行し、Vercel の値を差し替えてください。
+
 ## Vercel
 
 対象GitHubリポジトリは `nomuryo7159/HCF_teamsite`、Vercelのプロジェクト名は `hcf_teamsite` です。Application PresetはNext.js、ビルドは `npm run build`、インストールは `npm ci` を使用します。
@@ -69,6 +75,7 @@ VercelのProduction・Preview・Developmentに次の環境変数を設定しま�
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - `HCF_ENROLLMENT_SECRET`（サーバー専用のランダム値。公開変数にしない）
+- `GOOGLE_CALENDAR_ICS_URL`（任意・サーバー専用。Google カレンダー「チーム健康第一」の設定 →「カレンダーの統合」→「iCal 形式の非公開アドレス」。知っていれば誰でも予定を読めるため公開変数にしない）
 
 Previewからも同じDBへの編集を許可するかは、チームの運用に合わせて決めてください。Supabaseの許可済みリダイレクトURLにも対応するURLが必要です。
 
