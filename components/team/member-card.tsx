@@ -35,7 +35,10 @@ export default function MemberCard({
       <div className="avatar">
         {pending ? <Plus size={36} strokeWidth={1.4} /> : d.name.slice(0, 1)}
       </div>
-      <h4>{d.name}</h4>
+      <h4>
+        {d.name}
+        {d.badge && <span className="member-badge">{d.badge}</span>}
+      </h4>
       <p className="member-role">
         {pending ? "新しい仲間を待っています" : d.role || "役割はこれから"}
       </p>

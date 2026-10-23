@@ -1,6 +1,6 @@
 export type Data = {
  team: {name:string;mission:string};
- member: {name:string;role:string;bio:string;status:'active'|'pending';tags?:string[];mbti?:string;focus?:string;schedule?:string;values?:string;url?:string};
+ member: {name:string;role:string;bio:string;status:'active'|'pending';tags?:string[];mbti?:string;focus?:string;schedule?:string;values?:string;badge?:string;url?:string};
  rule: {title:string;body:string};
  phase: {title:string;assignee:string;startDate:string;endDate:string};
  task: {title:string;assignee:string;phaseId:string;dueDate:string;completed:boolean;completedAt?:string};
