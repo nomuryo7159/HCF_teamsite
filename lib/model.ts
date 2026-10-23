@@ -13,7 +13,7 @@ const url = z.string().max(2000).refine(v=>{if(!v)return true;try {return ['http
 const time = z.string().regex(/^$|^(?:[01]\d|2[0-3]):[0-5]\d$/);
 export const dataSchemas = {
  team:z.object({name:title,mission:body}).strict(),
- member:z.object({name:title,role:short,bio:body,status:z.enum(['active','pending'])}).strict(),
+ member:z.object({name:title,role:short,bio:body,status:z.enum(['active','pending']),tags:z.array(short.min(1)).max(30).optional(),mbti:short.optional(),focus:short.optional(),schedule:short.optional(),values:short.optional(),url:url.optional()}).strict(),
  rule:z.object({title,body}).strict(),
  phase:z.object({title,assignee:short,startDate:date,endDate:date}).strict(),
  task:z.object({title,assignee:short,phaseId:short,dueDate:date,completed:z.boolean(),completedAt:date.optional()}).strict(),
@@ -37,7 +37,7 @@ export const defaultRecords:TeamRecord[]=[
  ...([{id:'nomurin',name:'のむりん'},{id:'yukichi',name:'ゆきち'},{id:'pending',name:'参加予定'}] as const).map((m,i)=>({id:m.id,kind:'member' as const,data:{name:m.name,role:'',bio:'',status:m.id==='pending'?'pending' as const:'active' as const},revision:0,sortOrder:i})),
 ];
 
-const fieldLabels:Record<string,string>={name:'名前',mission:'目的',title:'タイトル',role:'役割',bio:'紹介',status:'参加状態',body:'本文',assignee:'担当者',startDate:'開始日',endDate:'終了日',dueDate:'期限',completed:'完了状態',completedAt:'完了日',phaseId:'フェーズ',date:'日付',startTime:'開始時刻',endTime:'終了時刻',description:'説明',url:'URL',summary:'要約',tags:'タグ',category:'カテゴリ'};
+const fieldLabels:Record<string,string>={name:'名前',mission:'目的',title:'タイトル',role:'役割',bio:'紹介',status:'参加状態',body:'本文',assignee:'担当者',startDate:'開始日',endDate:'終了日',dueDate:'期限',completed:'完了状態',completedAt:'完了日',phaseId:'フェーズ',date:'日付',startTime:'開始時刻',endTime:'終了時刻',description:'説明',url:'URL',summary:'要約',tags:'タグ',category:'カテゴリ',mbti:'MBTI',focus:'注力',schedule:'時間',values:'価値観'};
 export function validationErrorMessage(error:unknown):string {
  if(error instanceof z.ZodError){
   return error.issues.map(issue=>{
