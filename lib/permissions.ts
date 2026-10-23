@@ -1,9 +1,9 @@
 import { createSupabaseServerClient } from '@/lib/supabase';
-import { HttpError, requireSameOrigin } from './access';
+import { approvedSession, HttpError, requireSameOrigin } from './access';
 import { rpc } from './store';
 export const database=createSupabaseServerClient;
 export async function session(){
- return rpc<{signedIn:boolean;isOwner:boolean;canEdit:boolean}>(await database(),'hcf_access_status');
+ return approvedSession(await rpc<{signedIn:boolean;isOwner:boolean;canEdit:boolean}>(await database(),'hcf_access_status'));
 }
 export async function requirePermission(request:Request,ownerOnly=false){
  requireSameOrigin(request);

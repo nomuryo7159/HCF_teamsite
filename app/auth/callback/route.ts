@@ -1,3 +1,4 @@
+import {approvedSession} from '@/lib/access';
 import {verifyLoginState} from '@/lib/login-state';
 import {NextResponse} from 'next/server';
 import {cookies} from 'next/headers';
@@ -26,6 +27,13 @@ export async function GET(request:Request){
   const {error:signOutError}=await client.auth.signOut({scope:'local'});
   if(signOutError)console.error('HCF session cleanup failed',{code:signOutError.code});
   return NextResponse.redirect(new URL('/login?error=verification_failed',request.url));
+ }
+ const {data:access,error:accessError}=await client.rpc('hcf_access_status');
+ if(accessError||!access||!approvedSession(access).signedIn){
+  if(accessError)console.error('HCF approval check failed',{code:accessError.code});
+  const {error:signOutError}=await client.auth.signOut({scope:'local'});
+  if(signOutError)console.error('HCF session cleanup failed',{code:signOutError.code});
+  return NextResponse.redirect(new URL(accessError?'/login?error=verification_failed':'/login?error=approval_required',request.url));
  }
  return NextResponse.redirect(new URL('/',request.url));
 }
