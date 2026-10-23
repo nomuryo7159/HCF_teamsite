@@ -46,7 +46,7 @@ test('member profile fields are accepted and still validated',async()=>{
   const check=(data:object)=>db.query('select public.hcf_validate_data($1,$2::jsonb)',['member',JSON.stringify(data)]);
   const base={name:'のむりん',role:'',bio:'',status:'active'};
   await check(base);
-  await check({...base,tags:['🚃 ローカル線'],mbti:'INTP-A',focus:'x',schedule:'朝型',values:'y',url:'https://example.com'});
+  await check({...base,badge:'班長',tags:['🚃 ローカル線'],mbti:'INTP-A',focus:'x',schedule:'朝型',values:'y',url:'https://example.com'});
   await assert.rejects(check({...base,url:'javascript:alert(1)'}));
   await assert.rejects(check({...base,tags:'not-array'}));
   await assert.rejects(check({...base,mbti:'x'.repeat(201)}));
