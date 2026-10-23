@@ -44,6 +44,63 @@ test("reads TZID times and folded lines", () => {
   assert.equal(event.data.startTime, "19:00");
   assert.equal(event.data.endTime, "20:30");
 });
+test("keeps the end date of timed events that end on a later day", () => {
+  const [event] = parseIcs(
+    ics([
+      "UID:c",
+      "DTSTART;TZID=Asia/Tokyo:20260821T160000",
+      "DTEND;TZID=Asia/Tokyo:20260822T140000",
+      "SUMMARY:合宿",
+    ]),
+    "2026-08-01",
+    "2026-08-31",
+  );
+  assert.deepEqual(event.data, {
+    title: "合宿",
+    date: "2026-08-21",
+    startTime: "16:00",
+    endTime: "14:00",
+    endDate: "2026-08-22",
+  });
+});
+test("shows events ending at the next midnight as ending at 24:00", () => {
+  const [event] = parseIcs(
+    ics([
+      "UID:d",
+      "DTSTART;TZID=Asia/Tokyo:20260807T190000",
+      "DTEND;TZID=Asia/Tokyo:20260808T000000",
+      "SUMMARY:夜",
+    ]),
+    "2026-08-01",
+    "2026-08-31",
+  );
+  assert.deepEqual(event.data, {
+    title: "夜",
+    date: "2026-08-07",
+    startTime: "19:00",
+    endTime: "24:00",
+  });
+});
+test("keeps the end date of recurring events that cross midnight", () => {
+  const events = parseIcs(
+    ics([
+      "UID:e",
+      "DTSTART;TZID=Asia/Tokyo:20260803T230000",
+      "DTEND;TZID=Asia/Tokyo:20260804T010000",
+      "RRULE:FREQ=WEEKLY;COUNT=2",
+      "SUMMARY:深夜",
+    ]),
+    "2026-08-01",
+    "2026-08-31",
+  );
+  assert.deepEqual(
+    events.map((e) => [e.data.date, e.data.endDate, e.data.endTime]),
+    [
+      ["2026-08-03", "2026-08-04", "01:00"],
+      ["2026-08-10", "2026-08-11", "01:00"],
+    ],
+  );
+});
 test("spreads multi-day all-day events over each day", () => {
   const events = parseIcs(
     ics([
@@ -140,14 +197,32 @@ test("never exposes descriptions, locations, or links", () => {
     "2026-10-01",
     "2026-12-31",
   );
-  assert.deepEqual(Object.keys(events[0].data).sort(), ["date", "endTime", "startTime", "title"]);
+  assert.deepEqual(Object.keys(events[0].data).sort(), [
+    "date",
+    "endTime",
+    "startTime",
+    "title",
+  ]);
   assert.equal(JSON.stringify(events).includes("meet.google.com"), false);
 });
 test("hides details of private and confidential events", () => {
   const events = parseIcs(
     ics(
-      ["UID:p", "DTSTART:20261101T000000Z", "CLASS:PRIVATE", "SUMMARY:通院", "LOCATION:病院", "DESCRIPTION:メモ", "URL:https://example.com/p"],
-      ["UID:q", "DTSTART:20261101T010000Z", "CLASS:CONFIDENTIAL", "SUMMARY:面談"],
+      [
+        "UID:p",
+        "DTSTART:20261101T000000Z",
+        "CLASS:PRIVATE",
+        "SUMMARY:通院",
+        "LOCATION:病院",
+        "DESCRIPTION:メモ",
+        "URL:https://example.com/p",
+      ],
+      [
+        "UID:q",
+        "DTSTART:20261101T010000Z",
+        "CLASS:CONFIDENTIAL",
+        "SUMMARY:面談",
+      ],
       ["UID:r", "DTSTART:20261101T020000Z", "CLASS:PUBLIC", "SUMMARY:定例"],
     ),
     "2026-10-01",
@@ -161,14 +236,26 @@ test("hides details of private and confidential events", () => {
 test("modified occurrences of a private series stay hidden", () => {
   const events = parseIcs(
     ics(
-      ["UID:s", "DTSTART;TZID=Asia/Tokyo:20261102T090000", "RRULE:FREQ=WEEKLY;COUNT=2", "CLASS:PRIVATE", "SUMMARY:通院"],
-      ["UID:s", "RECURRENCE-ID;TZID=Asia/Tokyo:20261109T090000", "DTSTART;TZID=Asia/Tokyo:20261110T090000", "SUMMARY:通院（変更）", "DESCRIPTION:メモ"],
+      [
+        "UID:s",
+        "DTSTART;TZID=Asia/Tokyo:20261102T090000",
+        "RRULE:FREQ=WEEKLY;COUNT=2",
+        "CLASS:PRIVATE",
+        "SUMMARY:通院",
+      ],
+      [
+        "UID:s",
+        "RECURRENCE-ID;TZID=Asia/Tokyo:20261109T090000",
+        "DTSTART;TZID=Asia/Tokyo:20261110T090000",
+        "SUMMARY:通院（変更）",
+        "DESCRIPTION:メモ",
+      ],
     ),
     "2026-10-01",
     "2026-12-31",
   );
-  assert.deepEqual(
-    events.map((e) => [e.data.date, e.data.title]).sort(),
-    [["2026-11-02", "予定あり"], ["2026-11-10", "予定あり"]],
-  );
+  assert.deepEqual(events.map((e) => [e.data.date, e.data.title]).sort(), [
+    ["2026-11-02", "予定あり"],
+    ["2026-11-10", "予定あり"],
+  ]);
 });

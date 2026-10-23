@@ -3,7 +3,13 @@
 // and links (including Google Meet joining details) never leave the server.
 export type CalendarEvent = {
   id: string;
-  data: { title: string; date: string; startTime: string; endTime: string };
+  data: {
+    title: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    endDate?: string; // set only when a timed event ends on a later day
+  };
 };
 type Prop = { name: string; params: Record<string, string>; value: string };
 type Stamp = { wall: number; zone: string; allDay: boolean }; // wall: wall-clock time in `zone`, encoded as a UTC epoch
@@ -303,23 +309,29 @@ export function parseIcs(
           });
       } else {
         const at = inSite(s);
-        const endTime =
-          end && !end.allDay
-            ? inSite({
-                wall: instant(s) + instant(end) - instant(start),
-                zone: "UTC",
-                allDay: false,
-              }).time
-            : "";
-        events.push({
-          id: base,
-          data: {
-            title,
-            date: at.date,
-            startTime: at.time,
-            endTime,
-          },
-        });
+        const data: CalendarEvent["data"] = {
+          title,
+          date: at.date,
+          startTime: at.time,
+          endTime: "",
+        };
+        if (end && !end.allDay) {
+          const until = inSite({
+            wall: instant(s) + instant(end) - instant(start),
+            zone: "UTC",
+            allDay: false,
+          });
+          const nextDay = isoDate(Date.parse(at.date) + DAY);
+          if (until.date === at.date) data.endTime = until.time;
+          // Ending at the next midnight reads better as 24:00 on the same day.
+          else if (until.date === nextDay && until.time === "00:00")
+            data.endTime = "24:00";
+          else {
+            data.endTime = until.time;
+            data.endDate = until.date;
+          }
+        }
+        events.push({ id: base, data });
       }
     }
   }

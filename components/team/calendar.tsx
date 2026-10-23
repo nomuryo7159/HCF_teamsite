@@ -150,7 +150,12 @@ export default function Calendar({
                 {e.data.startTime && (
                   <p className="muted">
                     {e.data.startTime}
-                    {e.data.endTime && " – " + e.data.endTime}
+                    {e.data.endTime &&
+                      " – " +
+                        (e.data.endDate
+                          ? dateLabel(e.data.endDate) + " "
+                          : "") +
+                        e.data.endTime}
                   </p>
                 )}
                 {e.data.description && (
