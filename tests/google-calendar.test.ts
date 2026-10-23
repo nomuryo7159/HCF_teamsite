@@ -168,3 +168,17 @@ test("hides details of private and confidential events", () => {
     [["予定あり", "", undefined], ["予定あり", "", undefined], ["定例", "", undefined]],
   );
 });
+test("modified occurrences of a private series stay hidden", () => {
+  const events = parseIcs(
+    ics(
+      ["UID:s", "DTSTART;TZID=Asia/Tokyo:20261102T090000", "RRULE:FREQ=WEEKLY;COUNT=2", "CLASS:PRIVATE", "SUMMARY:通院"],
+      ["UID:s", "RECURRENCE-ID;TZID=Asia/Tokyo:20261109T090000", "DTSTART;TZID=Asia/Tokyo:20261110T090000", "SUMMARY:通院（変更）", "DESCRIPTION:メモ"],
+    ),
+    "2026-10-01",
+    "2026-12-31",
+  );
+  assert.deepEqual(
+    events.map((e) => [e.data.date, e.data.title, e.data.description]).sort(),
+    [["2026-11-02", "予定あり", ""], ["2026-11-10", "予定あり", ""]],
+  );
+});

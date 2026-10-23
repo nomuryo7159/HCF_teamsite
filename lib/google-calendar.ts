@@ -253,6 +253,8 @@ export function parseIcs(
     if (depth === 0) current.push(p);
   }
   const overrides = new Map<string, Set<string>>();
+  const seriesClass = new Map<string, string>();
+  const classOf = (r: Raw) => r.get("CLASS")?.value.trim().toUpperCase();
   for (const r of raws) {
     const id = r.get("RECURRENCE-ID");
     const uid = r.get("UID")?.value ?? "";
@@ -261,7 +263,7 @@ export function parseIcs(
       const set = overrides.get(uid) ?? new Set();
       set.add(key(s));
       overrides.set(uid, set);
-    }
+    } else if (!id && classOf(r)) seriesClass.set(uid, classOf(r)!);
   }
   const events: CalendarEvent[] = [];
   for (const r of raws) {
@@ -273,8 +275,9 @@ export function parseIcs(
     const end = dtend ? stamp(dtend.value, dtend.params) : null;
     const uid = r.get("UID")?.value ?? "";
     // The site is public: private events only show that the time is taken.
+    // A modified occurrence without its own CLASS inherits the series' CLASS.
     const hidden = ["PRIVATE", "CONFIDENTIAL"].includes(
-      r.get("CLASS")?.value.trim().toUpperCase() ?? "",
+      classOf(r) ?? seriesClass.get(uid) ?? "",
     );
     const location = hidden ? "" : unescape(r.get("LOCATION")?.value ?? "");
     const description = hidden
