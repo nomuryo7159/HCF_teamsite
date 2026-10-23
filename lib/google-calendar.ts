@@ -272,20 +272,27 @@ export function parseIcs(
     const dtend = r.get("DTEND");
     const end = dtend ? stamp(dtend.value, dtend.params) : null;
     const uid = r.get("UID")?.value ?? "";
-    const location = unescape(r.get("LOCATION")?.value ?? "");
-    const description = [
-      location && `場所：${location}`,
-      unescape(r.get("DESCRIPTION")?.value ?? ""),
-    ]
-      .filter(Boolean)
-      .join("\n")
-      .slice(0, 20000);
-    const link = r.get("URL")?.value.trim() ?? "";
+    // The site is public: private events only show that the time is taken.
+    const hidden = ["PRIVATE", "CONFIDENTIAL"].includes(
+      r.get("CLASS")?.value.trim().toUpperCase() ?? "",
+    );
+    const location = hidden ? "" : unescape(r.get("LOCATION")?.value ?? "");
+    const description = hidden
+      ? ""
+      : [
+          location && `場所：${location}`,
+          unescape(r.get("DESCRIPTION")?.value ?? ""),
+        ]
+          .filter(Boolean)
+          .join("\n")
+          .slice(0, 20000);
+    const link = hidden ? "" : (r.get("URL")?.value.trim() ?? "");
     const url = /^https?:\/\//i.test(link) ? link : undefined;
-    const title =
-      unescape(r.get("SUMMARY")?.value ?? "")
-        .trim()
-        .slice(0, 200) || "（タイトルなし）";
+    const title = hidden
+      ? "予定あり"
+      : unescape(r.get("SUMMARY")?.value ?? "")
+          .trim()
+          .slice(0, 200) || "（タイトルなし）";
     const overridden = r.get("RECURRENCE-ID")
       ? new Set<string>()
       : (overrides.get(uid) ?? new Set<string>());

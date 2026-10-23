@@ -153,3 +153,18 @@ test("keeps only http links", () => {
     [undefined, "https://example.com/x"],
   );
 });
+test("hides details of private and confidential events", () => {
+  const events = parseIcs(
+    ics(
+      ["UID:p", "DTSTART:20261101T000000Z", "CLASS:PRIVATE", "SUMMARY:通院", "LOCATION:病院", "DESCRIPTION:メモ", "URL:https://example.com/p"],
+      ["UID:q", "DTSTART:20261101T010000Z", "CLASS:CONFIDENTIAL", "SUMMARY:面談"],
+      ["UID:r", "DTSTART:20261101T020000Z", "CLASS:PUBLIC", "SUMMARY:定例"],
+    ),
+    "2026-10-01",
+    "2026-12-31",
+  );
+  assert.deepEqual(
+    events.map((e) => [e.data.title, e.data.description, e.data.url]),
+    [["予定あり", "", undefined], ["予定あり", "", undefined], ["定例", "", undefined]],
+  );
+});
