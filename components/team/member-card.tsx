@@ -5,6 +5,7 @@ import { Edit } from "./common";
 // Photos live in public/members/. Keyed by record id (Shun's record id is "pending").
 const photos: Record<string, string> = {
   nomurin: "/members/nomurin.jpg",
+  yukichi: "/members/yukichi.jpg",
   pending: "/members/shun.jpg",
 };
 
