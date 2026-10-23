@@ -63,6 +63,8 @@ select,input,textarea{background:#fffefb;border-color:#d7e0cb;color:#324a36}.sea
 .member-card.profile-card{display:flex;flex-direction:column;align-items:center;text-align:center;padding:23px 25px 26px}
 .profile-card .member-card-top{align-self:stretch;margin-bottom:0}
 .profile-card .avatar{width:96px;height:96px;font-size:40px;margin:10px 0 16px;grid-row:auto}
+.profile-card .avatar{overflow:hidden}
+.profile-card .avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .profile-card h4{font-size:19px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
 .member-badge{font-size:11px;font-weight:700;letter-spacing:.05em;line-height:1;color:#fff;background:#356a4f;border-radius:4px;padding:5px 8px}
 .profile-card .member-role{font-size:12px;margin-top:6px}
