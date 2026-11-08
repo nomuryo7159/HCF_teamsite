@@ -1,23 +1,20 @@
 [
   {"name":"users","label":"会員","description":"会員の年代・性別・登録日。注文とレビューから参照されます。","columns":[
-    ["user_id","会員ID","PK"],["age_group","年代",""],["gender","性別",""],["registered_at","会員登録日時",""]
+    ["user_id","会員ID","PK","varchar"],["age_group","年代","","varchar"],["gender","性別","","varchar"],["registered_at","会員登録日","","date"]
   ]},
   {"name":"orders","label":"注文","description":"誰が、いつ、どの用途で注文したかを記録します。recipient_keyは送り先の匿名キーです。","columns":[
-    ["order_id","注文ID","PK"],["user_id","注文した会員ID","FK"],["ordered_at","注文日時",""],["gift_purpose","購入時の用途タグ",""],["estimated_scene","分析部門が推定したシーン",""],["recipient_key","送り先の匿名キー",""],["ship_to_type","送り先の区分（自宅／会社）",""],["total_amount","注文の合計金額",""]
+    ["order_id","注文ID","PK","varchar"],["user_id","注文した会員ID","FK","varchar"],["ordered_at","注文日時","","datetime"],["gift_purpose","購入時の用途タグ","","varchar"],["estimated_scene","分析部門が推定したシーン","","varchar"],["recipient_key","送り先の匿名キー","","varchar"],["ship_to_type","送り先の区分（自宅／会社）","","varchar"],["total_amount","注文の合計金額","","int"]
   ]},
-  {"name":"order_items","label":"注文明細","description":"注文ごとの商品・数量・購入時の単価。order_idとline_noの組合せが主キー候補です。","columns":[
-    ["order_id","注文ID","PK FK"],["line_no","注文内の明細番号","PK"],["product_id","商品ID","FK"],["quantity","購入数量",""],["unit_price","購入時の単価",""]
+  {"name":"order_items","label":"注文明細","description":"注文ごとの商品・数量・購入時の単価。order_idとline_noの組合せが複合主キーです。","columns":[
+    ["order_id","注文ID","PK FK","varchar"],["line_no","注文内の明細番号","PK","int"],["product_id","商品ID","FK","varchar"],["quantity","購入数量","","int"],["unit_price","購入時の単価","","int"]
   ]},
-  {"name":"products","label":"商品","description":"商品名、価格、説明、配送日数、在庫などの商品情報。3つの関連テーブルと注文明細から参照されます。","columns":[
-    ["product_id","商品ID","PK"],["product_name","商品名",""],["category","カテゴリ",""],["price","商品価格",""],["brand","ブランド",""],["description","商品説明",""],["size","サイズ",""],["delivery_days","配送日数",""],["gift_wrap","ラッピング対応",""],["message_card","メッセージカード対応",""],["rating","商品の評価",""],["review_count","レビュー件数",""],["sales_count","販売数",""],["stock","在庫数",""],["registered_at","商品登録日時",""]
+  {"name":"products","label":"商品","description":"商品名、価格、説明、配送日数、在庫などの商品情報。注文明細・商品シーン・レビューから参照されます。","columns":[
+    ["product_id","商品ID","PK","varchar"],["product_name","商品名","","varchar"],["category","カテゴリ","","varchar"],["price","商品価格","","int"],["brand","ブランド","","varchar"],["description","商品説明","","text"],["size","サイズ","","varchar"],["delivery_days","配送日数","","int"],["gift_wrap","ラッピング対応","","tinyint"],["message_card","メッセージカード対応","","tinyint"],["rating","商品の評価","","decimal"],["review_count","レビュー件数","","int"],["sales_count","販売数","","int"],["stock","在庫数","","int"],["registered_at","商品登録日","","date"]
   ]},
-  {"name":"product_facts","label":"商品の属性・根拠","description":"商品ごとの属性、値、出典を記録します。元のER図には主キー候補の指定がありません。","columns":[
-    ["product_id","商品ID","FK"],["fact","属性・事実の項目名",""],["value","項目の値",""],["source","情報の出典",""]
-  ]},
-  {"name":"product_scenes","label":"贈るシーンのタグ","description":"商品登録時にマーケティング部が付けたタグ。相手との関係や好みは含みません。主キー候補は元資料に記載がありません。","columns":[
-    ["product_id","商品ID","FK"],["scene_tag","贈るシーンのタグ",""]
+  {"name":"product_scenes","label":"贈るシーンのタグ","description":"商品登録時にマーケティング部が付けたタグ。相手との関係や好みは含みません。product_idとscene_tagの組合せが複合主キーです。","columns":[
+    ["product_id","商品ID","PK FK","varchar"],["scene_tag","贈るシーンのタグ","PK","varchar"]
   ]},
   {"name":"reviews","label":"レビュー","description":"商品に対する会員の評価と投稿。本文のない、星だけのレビューもあります。","columns":[
-    ["review_id","レビューID","PK"],["product_id","評価した商品ID","FK"],["user_id","投稿した会員ID","FK"],["rating","星の評価（1〜5）",""],["comment","レビュー本文",""],["posted_at","投稿日時",""]
+    ["review_id","レビューID","PK","varchar"],["product_id","評価した商品ID","FK","varchar"],["user_id","投稿した会員ID","FK","varchar"],["rating","星の評価（1〜5）","","int"],["comment","レビュー本文","","text"],["posted_at","投稿日","","date"]
   ]}
 ]
