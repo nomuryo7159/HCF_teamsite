@@ -14,27 +14,27 @@ export default function GiftiaChatbot() {
   return (
     <section id="giftia-br01" aria-labelledby="giftia-br01-title">
       <h2 id="giftia-br01-title">検索結果から購入判断まで（BR-01・実装案）</h2>
-      <h3>1. 選択したシーンとの関連度で検索結果を整理する</h3>
-      <p>検索画面のシーン選択肢には、DBの <code>product_scenes.scene_tag</code> の登録値を重複なく取得して使います。開発DBで確認した値は、お歳暮・お中元・お礼・結婚祝い・出産祝い・送別・誕生日・父の日・母の日の9種類です。検索条件に合う商品のうち、選んだシーンと一致するタグが付いた商品を優先します。「送別」を選ぶと、<code>scene_tag = '送別'</code> の商品が先に並びます。</p>
-      <p>選んだシーンのタグがない商品は、他のタグの有無にかかわらず、同じ商品のレビュー本文にそのシーンでの利用が書かれているかで関連性を判断します。根拠がない商品は通常の評価順で表示する案です。シーン未選択時も現行の評価順を使う案とし、同順位の扱いは未決定です。</p>
-      <p><strong>修正候補</strong>　<code>giftia-frontend/app/page.tsx</code> にシーンの選択欄を設け、<code>giftia-frontend/lib/api.ts</code> でDB由来の選択肢を取得し、選んだタグを検索APIに送ります。FastAPIは選択肢をDBから返し、検索時に受け取ったタグが登録値であることを確認します。<code>backend/main.py</code> の <code>GET /api/search</code> は、検索条件に合う候補を順位付けしてから表示件数を適用する案です。シーンを切り替えると優先するタグも切り替わることを確認します。</p>
+      <h3>1. 「送別」選択時に検索結果を関連度順に整理する</h3>
+      <p>検索画面のシーン選択肢には、DBの <code>product_scenes.scene_tag</code> の登録値を重複なく取得して使います。開発DBで確認した値は、お歳暮・お中元・お礼・結婚祝い・出産祝い・送別・誕生日・父の日・母の日の9種類です。BR-01一式を適用するのは「送別」を選んだ場合です。送別以外・未選択は今回の開発スコープ外とし、現行の評価順と商品カードを使います。「送別」を選ぶと、<code>scene_tag = '送別'</code> の商品が先に並びます。</p>
+      <p>送別タグがない商品は、他のタグの有無にかかわらず、同じ商品のレビュー本文に送別での利用が書かれているかで関連性を判断します。根拠がない商品は通常の評価順で表示する案です。同順位の扱いは未決定です。</p>
+      <p><strong>修正候補</strong>　<code>giftia-frontend/app/page.tsx</code> にシーンの選択欄を設け、<code>giftia-frontend/lib/api.ts</code> でDB由来の選択肢を取得し、選んだタグを検索APIに送ります。FastAPIは選択肢をDBから返し、検索時に受け取ったタグが登録値であることを確認します。<code>backend/main.py</code> の <code>GET /api/search</code> は、送別選択時にBR-01の適用条件を確認し、適用時のみ検索条件に合う候補を関連度順に並べてから表示件数を適用します。比較実験中は割付先も確認します。</p>
       <h3>2. 商品カードに関連レビューと商品説明を表示する</h3>
-      <p>各商品内のレビューは、商品のタグにかかわらず、選んだシーンでの利用を本文から確認できるものを優先し、根拠になる一節と出典を示します。商品説明から確認できる仕様も表示し、関連レビューが不足する場合は説明を主な判断材料にします。入り数などの情報が見つからない場合は未確認と表示します。</p>
+      <p>各商品内のレビューは、商品のタグにかかわらず、送別での利用を本文から確認できるものを優先し、根拠になる一節と出典を示します。商品説明から確認できる仕様も表示し、関連レビューが不足する場合は説明を主な判断材料にします。入り数などの情報が見つからない場合は未確認と表示します。</p>
       <p><strong>修正候補</strong>　<code>backend/main.py</code> から商品仕様・レビュー本文・出典を返し、<code>giftia-frontend/lib/api.ts</code> と <code>giftia-frontend/app/ResultCard.tsx</code> で受け取って表示します。商品に付いたシーンタグと、個々のレビューに書かれた利用場面は別々に確認します。</p>
       <h4 id="giftia-shared-evidence">検索とチャットで共用する取得処理</h4>
       <p>FastAPI側の共通処理（配置例は <code>backend/product_evidence.py</code>）は、商品IDを受け取り、商品説明から確認できる仕様、同じ商品に紐づく本文のあるレビュー、出典IDを返します。BR-02の回答は、公開・再利用条件が決まった後に取得対象へ加える候補です。</p>
       <ul className="guide-numbered">
-        <li><strong>検索</strong>　検索条件に合う商品候補を取得して並べます。共通処理で取得した情報から、カードに表示する選択シーン向けのレビューを選びます。</li>
+        <li><strong>検索</strong>　検索条件に合う商品候補を取得して並べます。共通処理で取得した情報から、カードに表示する送別向けのレビューを選びます。</li>
         <li><strong>チャット</strong>　選択された商品について共通処理を呼び、質問に関係する情報を選びます。<code>backend/chat.py</code> が生成AIを呼び、回答と出典を照合します。</li>
       </ul>
       <h3 id="giftia-chatbot">3. AIチャットで残った疑問に答える</h3>
-      <p>検索結果の商品カードから「職場で配りやすい？」「送別品として選ぶ根拠は？」と質問できるようにします。初版は商品1件・1問ずつを対象とし、商品説明と関連レビューから判断材料を示します。</p>
+      <p>BR-01が有効な商品カードから「職場で配りやすい？」「送別品として選ぶ根拠は？」と質問できるようにします。初版は商品1件・1問ずつを対象とし、商品説明と関連レビューから判断材料を示します。</p>
 
       <figure className="giftia-chat-flow">
         <figcaption>質問から回答までのデータの流れ</figcaption>
         <ol>
-          <li><strong>検索結果のチャット（Next.js）</strong><span>選んだ商品IDと質問を送信</span></li>
-          <li><strong>チャットAPI（FastAPI）</strong><span>入力を検証し、共通処理で取得した情報から質問に関係する根拠を選択</span><small>Azure MySQL　→　商品説明、レビュー本文、出典の識別子</small></li>
+          <li><strong>検索結果のチャット（Next.js）</strong><span>商品ID・質問・選択中のシーンを送信</span></li>
+          <li><strong>チャットAPI（FastAPI）</strong><span>送別選択と適用条件を確認し、共通処理で取得した情報から質問に関係する根拠を選択</span><small>Azure MySQL　→　商品説明、レビュー本文、出典の識別子</small></li>
           <li><strong>生成AI（FastAPIから呼び出し）</strong><span>質問と必要な根拠を受け取り、回答と出典の識別子を返す</span></li>
           <li><strong>チャットAPI → 検索結果のチャット</strong><span>出典を照合し、回答・出典・確認できなかった点を表示</span></li>
         </ol>
@@ -42,7 +42,7 @@ export default function GiftiaChatbot() {
 
       <h3>APIと回答の方針</h3>
       <ul className="guide-numbered">
-        <li><code>POST /api/chat</code> に <code>product_id</code> と <code>question</code> を送る案です。応答には <code>answer</code>、<code>sources</code>、<code>status</code> を含め、出典の本文や表示名はサーバーが実際の取得結果から組み立てます。</li>
+        <li><code>POST /api/chat</code> に <code>product_id</code>、<code>question</code>、<code>scene_tag</code> を送る案です。FastAPIは送別選択と、実験中は割付先を確認してから回答処理に進みます。送別以外に切り替えたり選択を解除したりしたときは、画面でチャットを閉じ、表示中・応答待ちの回答を破棄します。応答には <code>answer</code>、<code>sources</code>、<code>status</code> を含め、出典の本文や表示名はサーバーが実際の取得結果から組み立てます。</li>
         <li>商品IDはサーバー側で照合し、商品説明と本文のあるレビューを取得します。送別・質問との関連が高いものを少数選び、購入者名、注文情報、連絡先はモデルに送らない方針です。</li>
         <li>質問やレビュー本文は参照データとしてモデルに渡し、操作指示として扱いません。回答の出典IDを取得済みデータと照合し、出典IDの照合で確認できるのは参照先の存在です。根拠のない特徴や配送日の断定を避けるようモデルに指示し、根拠不足時は「商品情報からは確認できません」と返すケースをテストします。</li>
         <li>レビューがないときは商品説明で確認できる範囲を回答します。モデルのタイムアウトや応答不正時は商品説明への案内と再試行を表示し、検索結果は引き続き利用できるようにします。</li>
