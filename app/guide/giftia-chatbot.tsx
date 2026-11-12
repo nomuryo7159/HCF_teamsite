@@ -1,9 +1,9 @@
 const files = [
   ['修正', 'giftia-frontend/app/page.tsx', '開いているチャットと対象商品IDを管理。商品を切り替えたときは別の商品の回答が表示されないようにする。'],
   ['修正', 'giftia-frontend/app/ResultCard.tsx', '「この商品について聞く」ボタンから選択した商品IDを親画面に渡す。'],
-  ['追加案', 'giftia-frontend/app/ProductChat.tsx', '質問入力、送信中、回答と出典、再試行を表示する。画面のスタイルは既存の検索画面に合わせる。'],
+  ['追加案', 'giftia-frontend/app/ProductChat.tsx', '質問入力、送信中、回答と出典、再試行を表示する。2つの観点と共有用の一文も表示する。画面のスタイルは既存の検索画面に合わせる。'],
   ['修正', 'giftia-frontend/lib/api.ts', 'チャット専用のAPI呼び出しと応答型を追加する。検索用の searchGifts は既存のまま使う。'],
-  ['修正', 'backend/main.py', 'POST /api/chat の入口を追加し、商品ID・質問の形式と長さを検証する。直接接続する開発構成では、許可済みオリジンからのPOSTも受け付ける。'],
+  ['修正', 'backend/main.py', 'POST /api/chat の入口を追加し、商品ID・質問の形式と長さ、指定された表示モードを検証する。直接接続する開発構成では、許可済みオリジンからのPOSTも受け付ける。'],
   ['追加案', 'backend/chat.py', '商品説明と関連レビューの取得、モデルへの入力、出力の検証と失敗時の処理を担当する。既存の database.py の fetch_all を再利用する。'],
   ['修正候補', 'backend/.env.example・backend/requirements.txt', '採用するモデルに応じて設定名と依存関係を追加する。キーの実値はサーバーの環境変数で管理する。'],
   ['追加案', 'backend/tests/test_chat.py', 'DBとモデルを差し替え、根拠がある場合、根拠がない場合、APIの異常系を再現する。'],
@@ -33,6 +33,18 @@ export default function GiftiaChatbot() {
         <li>レビューがないときは商品説明で確認できる範囲を回答します。モデルのタイムアウトや応答不正時は商品説明への案内と再試行を表示し、検索結果は引き続き利用できるようにします。</li>
       </ul>
 
+      <h3>同僚に相談する前に、AIが2つの観点で確認する</h3>
+      <p>商品カードに「同僚に相談する前に確認」を置く案です。「AIによる2つの観点」と明示し、各観点で選ぶ理由、気になる点、出典を表示します。見方が分かれた場合も両方を示します。</p>
+      <figure className="giftia-overview-flow">
+        <figcaption>表示例（架空の商品）</figcaption>
+        <ol>
+          <li><strong>受け取る人に合いそうか</strong><span>商品説明では常温保存できます。相手の好みは確認できません。</span></li>
+          <li><strong>一緒に贈る同僚に説明しやすいか</strong><span>職場で配りやすかったという購入者レビューがあります。10人分の入り数は未確認です。</span></li>
+          <li><strong>みんなに伝える一文</strong><span>「職場で配りやすかったというレビューがあるので候補にしています。人数分の入り数だけ確認したいです。」</span></li>
+        </ol>
+      </figure>
+      <p><code>POST /api/chat</code> に二つの観点を指定する入力を追加し、1回の応答で各観点の理由・未確認点・出典と共有用の一文を返す案です。<code>ProductChat.tsx</code> が結果を表示します。一文は画面上に提示し、共同購入者への通知はBR-05として今回の対象外です。</p>
+
       <h3 id="giftia-chatbot-files">修正・追加するファイル</h3>
       <div className="guide-table-wrap"><table className="guide-table">
         <thead><tr><th scope="col">区分</th><th scope="col">Giftiaリポジトリ内の場所</th><th scope="col">修正方針</th></tr></thead>
@@ -44,7 +56,7 @@ export default function GiftiaChatbot() {
       <h3 id="giftia-chatbot-checks">作る順番と確認するケース</h3>
       <ol className="guide-numbered">
         <li>商品IDで根拠を取得し、固定の応答で商品カードからチャットまでつなぎます。商品切替と存在しない商品IDを確認します。</li>
-        <li>モデルを接続し、関連レビューあり、レビューなし、説明にも根拠なし、存在しない出典ID、タイムアウトを確認します。</li>
+        <li>モデルを接続し、関連レビューあり、レビューなし、説明にも根拠なし、存在しない出典ID、タイムアウトを確認します。二つの観点で結論が分かれる場合や、一文に未確認の仕様を混ぜないことも確認します。</li>
       </ol>
       <p>採用モデル、レビューの関連度と件数、応答時間・費用の上限、公開時の認証と利用制限、会話の保存は未決定です。初版案は会話履歴をDBに保存せず、検索と別のAPIで動かします。</p>
     </section>
