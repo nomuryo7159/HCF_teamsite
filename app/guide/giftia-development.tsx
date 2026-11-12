@@ -22,13 +22,13 @@ const setup = [
 ];
 
 const workflow = [
-  ['最新を取り込む', '左下のブランチ名で main を選び、ソース管理の「…」からプルする。', 'git switch main\ngit pull --ff-only'],
-  ['ブランチを作る', '左下のブランチ名から「新しいブランチの作成」を選ぶ。', 'git switch -c feat/review-display'],
-  ['変更して確かめる', '変更を保存し、ブラウザーで該当機能を確認する。', 'npm run lint\nnpm run build'],
-  ['コミットする', 'ソース管理で対象ファイルの「＋」を押し、メッセージを入力してコミットする。', 'git add <変更ファイル>\ngit commit -m "feat: describe change"'],
-  ['プッシュする', '「ブランチの発行」を選ぶ。', 'git push -u origin HEAD'],
-  ['PRを作る', 'GitHubで main 宛てにPRを開き、目的、変更内容、確認方法を書く。', 'gh pr create --base main'],
-  ['マージされたら', 'main に戻り、最新の状態を取り込む。', 'git switch main\ngit pull --ff-only'],
+  ['最新を取り込む', 'Sourcetree', 'ローカルの main に切り替え、ツールバーの「プル」で取得元に origin、ブランチに main を選ぶ。'],
+  ['ブランチを作る', 'Sourcetree', '最新の main から「ブランチ」で作業ブランチを作成し、作成したブランチに切り替える。'],
+  ['変更して確かめる', 'ブラウザー・Sourcetree', '変更した機能をブラウザーで試し、Sourcetreeのファイルステータスで差分を確認する。'],
+  ['コミットする', 'Sourcetree', '対象ファイルをステージし、変更内容が分かるメッセージを入力して「コミット」を選ぶ。'],
+  ['プッシュする', 'Sourcetree', '「プッシュ」で origin を選び、ローカルとリモートの両方に作業ブランチを指定する。'],
+  ['PRを作る', 'GitHub', '「Compare & pull request」などから、base に main、compare に作業ブランチを指定する。目的、変更内容、確認方法を書いてPRを作成する。レビューとマージもGitHubで行う。'],
+  ['マージ後に更新する', 'Sourcetree', 'ローカルの main に切り替え、origin の main をプルする。'],
 ];
 
 const modules = [
@@ -118,13 +118,13 @@ export default function GiftiaDevelopment() {
 
       <section id="giftia-github">
         <h2>GitHubでの作業の流れ</h2>
-        <p>VS Codeの画面操作かターミナルで進めます。<code>npm</code> の確認コマンドは <code>giftia-frontend</code> で実行します。<code>gh</code> を使うにはGitHub CLIへのログインが必要です。</p>
+        <p>ブランチの作成、コミット、プル、プッシュはSourcetreeで行います。PRはGitHubの画面で扱います。ボタン名はOSや表示言語によって異なる場合があります。</p>
         <div className="guide-table-wrap"><table className="guide-table">
-          <thead><tr><th scope="col">手順</th><th scope="col">VS Codeの画面で操作</th><th scope="col">ターミナルで操作</th></tr></thead>
-          <tbody>{workflow.map(([step, visual, command], index) => <tr key={step}><th scope="row">{index + 1}. {step}</th><td>{visual}</td><td><pre><code>{command}</code></pre></td></tr>)}</tbody>
+          <thead><tr><th scope="col">手順</th><th scope="col">操作する場所</th><th scope="col">操作内容</th></tr></thead>
+          <tbody>{workflow.map(([step, tool, instruction], index) => <tr key={step}><th scope="row">{index + 1}. {step}</th><td>{tool}</td><td>{instruction}</td></tr>)}</tbody>
         </table></div>
         <h3>困ったとき</h3>
-        <p>現在のブランチはVS Codeの左下か <code>git status --short --branch</code> で確認できます。main で変更を始めた場合は、コミット前に作業ブランチを作ると変更を引き継げます。</p>
+        <p>現在のブランチはSourcetreeのサイドバーの「ブランチ」で確認できます。main で変更を始めた場合は、コミット前に main の現在位置から作業ブランチを作成して切り替え、変更が引き継がれたことを確認します。</p>
         <p>ブランチ命名規則、レビューの最低基準、マージ担当、保護設定の担当は未決定です。班のルールはREADMEと <code>AGENTS.md</code> を参照してください。 <a href="https://github.com/HealthCareFirst/giftia-frontend-backend">Giftia開発リポジトリ</a></p>
       </section>
 
