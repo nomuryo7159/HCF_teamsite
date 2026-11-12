@@ -2,6 +2,7 @@ import Link from 'next/link';
 import GiftiaDetail from './giftia-detail';
 import GiftiaArchitecture from './giftia-architecture';
 import GiftiaChatbot from './giftia-chatbot';
+import GiftiaPostPurchase from './giftia-post-purchase';
 import { GiftiaScope, GiftiaVerification } from './giftia';
 
 const sections = [
@@ -10,7 +11,9 @@ const sections = [
   ['giftia-github', 'GitHubでの作業の流れ'],
   ['giftia-architecture', 'アーキテクチャ'],
   ['giftia-order', '担当と作る順番'],
-  ['giftia-chatbot', 'AIチャットボット'],
+  ['giftia-chatbot', 'AIチャットボット（BR-01）'],
+  ['giftia-survey', '購入後アンケート（BR-02）'],
+  ['giftia-coupon', 'クーポン付与（BR-03）'],
   ['giftia-files', 'ファイル一覧'],
   ['giftia-verification', '動作確認と施策の検証'],
 ] as const;
@@ -147,6 +150,7 @@ export default function GiftiaDevelopment() {
       </section>
 
       <GiftiaChatbot />
+      <GiftiaPostPurchase />
 
       <section id="giftia-files">
         <h2>ファイル一覧（フォルダ構成）</h2>
