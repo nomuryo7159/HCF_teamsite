@@ -1,0 +1,31 @@
+.giftia-main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 36px clamp(16px, 4vw, 48px) 64px;
+  color: var(--ink);
+  line-height: 1.75;
+  font-size: 14px;
+}
+
+.giftia-main h1 { margin: 0 0 8px; font-size: clamp(26px, 5vw, 38px); }
+.giftia-main h2 { margin: 0 0 12px; font-size: 22px; }
+.giftia-main h3 { margin: 24px 0 8px; font-size: 16px; }
+.giftia-main p { margin: 8px 0 12px; }
+.giftia-main nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 18px 0 26px; }
+.giftia-main a, .giftia-detail-trigger { color: #386948; text-decoration: underline; text-underline-offset: 3px; }
+.giftia-main .guide-table { min-width: 480px; }
+.giftia-main .guide-table td, .giftia-main .guide-table th { vertical-align: top; }
+.giftia-main .guide-numbered { font-size: inherit; }
+.giftia-actions { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 12px 0; }
+.giftia-detail-trigger { background: none; border: 0; padding: 2px 0; font: inherit; text-align: left; cursor: pointer; }
+.giftia-dialog { width: min(720px, calc(100% - 32px)); max-height: 85dvh; margin: auto; overflow: auto; padding: 22px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); color: var(--ink); }
+.giftia-dialog::backdrop { background: #20352680; }
+.giftia-dialog header { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.giftia-dialog header h2 { overflow-wrap: anywhere; }
+.giftia-dialog header button { padding: 4px 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--soft); color: var(--ink); white-space: nowrap; cursor: pointer; }
+.giftia-dialog pre, .giftia-main td pre { margin: 4px 0; overflow: auto; }
+.giftia-dialog pre { padding: 10px; background: var(--soft); border-radius: 5px; }
+.giftia-tree, .giftia-tree ul { list-style: none; padding-left: 14px; }
+.giftia-tree ul { margin-left: 6px; border-left: 1px solid var(--line); }
+.giftia-tree li { padding: 2px 0; overflow-wrap: anywhere; }
+.giftia-status { display: inline-block; margin-left: 8px; padding: 0 7px; border-radius: 4px; background: var(--soft); font-size: 11px; }

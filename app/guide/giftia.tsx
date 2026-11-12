@@ -1,15 +1,7 @@
-import GiftiaDevelopment from './giftia-development';
-
 export default function GiftiaGuide() {
   return (
-    <section id="giftia" aria-labelledby="giftia-title">
-      <div className="guide-section-heading">
-        <h2 id="giftia-title">Giftia 実装ガイド（暫定版）</h2>
-        <p>2026年11月12日の仮確定。送別品を選ぶ人が、候補がその場面に合う理由を確認し、納得して購入を決められるようにします。</p>
-      </div>
-
-      <GiftiaDevelopment />
-
+    <section id="giftia-scope" aria-labelledby="giftia-scope-title">
+      <h2 id="giftia-scope-title">今回の実装範囲と検証方法</h2>
       <h3>要求定義と今回の実装範囲</h3>
       <ul className="guide-numbered">
         <li><strong>BR-01（優先）</strong> 商品を納得して選べるよう、検索結果では送別シーンとの関連性が高いレビューを優先表示する案Bを先に試します。</li>
