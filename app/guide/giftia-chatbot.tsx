@@ -1,9 +1,9 @@
 const files = [
-  ['修正', 'giftia-frontend/app/page.tsx', '開いているチャットと対象商品IDを管理。商品を切り替えたときは別の商品の回答が表示されないようにする。'],
-  ['修正', 'giftia-frontend/app/ResultCard.tsx', '「この商品について聞く」ボタンから選択した商品IDを親画面に渡す。'],
+  ['修正', 'giftia-frontend/app/page.tsx', 'DB由来の選択肢でシーン選択欄を作り、選択値を管理する。BR-01の適用時にチャットを開けるようにし、商品変更・送別以外への切替・選択解除時は古い回答を表示しない。'],
+  ['修正', 'giftia-frontend/app/ResultCard.tsx', 'BR-01の適用時に関連レビューと商品説明を表示し、「この商品について聞く」ボタンから商品IDを親画面に渡す。'],
   ['追加案', 'giftia-frontend/app/ProductChat.tsx', '質問入力、送信中、回答と出典、再試行を表示する。2つの観点と共有用の一文も表示する。画面のスタイルは既存の検索画面に合わせる。'],
-  ['修正', 'giftia-frontend/lib/api.ts', 'チャット専用のAPI呼び出しと応答型を追加する。検索用の searchGifts は既存のまま使う。'],
-  ['修正', 'backend/main.py', 'POST /api/chat の入口を追加し、商品ID・質問の形式と長さ、指定された表示モードを検証する。直接接続する開発構成では、許可済みオリジンからのPOSTも受け付ける。'],
+  ['修正', 'giftia-frontend/lib/api.ts', 'シーンタグ一覧を取得する呼び出しを追加し、searchGifts で選択値を検索APIに渡す。チャット用の呼び出しでも選択値を送り、検索・チャットの追加応答項目を受け取る。'],
+  ['修正', 'backend/main.py', 'product_scenes.scene_tag の重複を除いた一覧を返すAPIを追加する。GET /api/search で選択値を検証し、送別かつBR-01の適用条件を満たす場合に関連度順と追加表示用の情報を返す。POST /api/chat でも適用条件と入力を検証する。直接接続の開発構成では、許可済みオリジンからのPOSTを受け付ける。'],
   ['追加案', 'backend/product_evidence.py', '商品IDから商品説明、本文のあるレビュー、出典IDを取得する。既存の database.py の fetch_all を使い、検索とチャットに同じ形式で返す。'],
   ['追加案', 'backend/chat.py', '共通の取得処理を呼び、質問に関係する根拠を選ぶ。AIへの問い合わせ、回答と出典の照合、失敗時の処理を担当する。'],
   ['修正候補', 'backend/.env.example・backend/requirements.txt', '採用するモデルに応じて設定名と依存関係を追加する。キーの実値はサーバーの環境変数で管理する。'],
