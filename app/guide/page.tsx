@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import GiftiaDevelopment from './giftia-development';
-import GiftiaGuide from './giftia';
 import './giftia.css';
 
 export const metadata: Metadata = {
@@ -20,7 +19,6 @@ export default function GuidePage() {
         <h1>実装ガイド — Giftia</h1>
         <p>暫定版（2026年11月12日の仮確定に基づく）。送別品を選ぶ人の購入判断を後押しする施策の開発手順です。</p>
         <GiftiaDevelopment />
-        <GiftiaGuide />
       </main>
     </div>
   );
