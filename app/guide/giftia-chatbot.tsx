@@ -11,8 +11,15 @@ const files = [
 
 export default function GiftiaChatbot() {
   return (
-    <section id="giftia-chatbot" aria-labelledby="giftia-chatbot-title">
-      <h2 id="giftia-chatbot-title">購入を後押しするAIチャットボット（BR-01・実装案）</h2>
+    <section id="giftia-br01" aria-labelledby="giftia-br01-title">
+      <h2 id="giftia-br01-title">検索結果から購入判断まで（BR-01・実装案）</h2>
+      <h3>1. 検索結果を送別シーンとの関連度で整理する</h3>
+      <p>現行の条件で在庫のある商品候補を取得し、商品シーンタグや商品説明などを手がかりに、送別に関連する商品を上位にする案です。現行コードでは評価の降順です。商品一覧の順位付けは追加案で、関連度の算定、同順位の扱い、関連情報がない場合の並びは未決定です。</p>
+      <p><strong>修正候補</strong>　<code>backend/main.py</code> の <code>GET /api/search</code> で、検索条件に合う候補全体を順位付けしてから表示件数を適用する案です。検索条件で除外された商品が順位付けで混ざらないことを確認します。</p>
+      <h3>2. 商品カードに関連レビューと商品説明を表示する</h3>
+      <p>商品ごとに、送別や職場での利用を本文から確認できるレビューを優先し、根拠になる一節と出典を示します。商品説明から確認できる仕様も表示し、関連レビューが不足する場合は説明を主な判断材料にします。入り数などの情報が見つからない場合は未確認と表示します。</p>
+      <p><strong>修正候補</strong>　<code>backend/main.py</code> から商品仕様・レビュー本文・出典を返し、<code>giftia-frontend/lib/api.ts</code> と <code>giftia-frontend/app/ResultCard.tsx</code> で受け取って表示します。チャットでも同じ根拠取得処理を使う案です。商品に付いたシーンタグと、個々のレビューに書かれた利用場面は別々に確認します。</p>
+      <h3 id="giftia-chatbot">3. AIチャットで残った疑問に答える</h3>
       <p>検索結果の商品カードから「職場で配りやすい？」「送別品として選ぶ根拠は？」と質問できるようにします。初版は商品1件・1問ずつを対象とし、商品説明と関連レビューから判断材料を示します。</p>
 
       <figure className="giftia-chat-flow">
