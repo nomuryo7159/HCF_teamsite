@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import GiftiaDetail from './giftia-detail';
+import GiftiaArchitecture from './giftia-architecture';
 
 const sections = [
   ['giftia-setup', '開発環境の準備'],
   ['giftia-github', 'GitHubでの作業の流れ'],
   ['giftia-order', '担当と作る順番'],
+  ['giftia-architecture', 'アーキテクチャ'],
   ['giftia-files', 'ファイル一覧（フォルダ構成）'],
   ['giftia-scope', '今回の実装範囲と検証方法'],
 ] as const;
@@ -32,13 +34,26 @@ const modules = [
   { title: '5%オフクーポン（BR-03）', reason: '回答完了を判定できるようになってから付与する。', detail: '配布方法、有効期限、重複発行の防止方法は未決定。', check: '回答完了時に付与され、同じ回答の再送で重複しないことを確かめる。' },
 ];
 
+const rootFiles = [
+  ['README.md', '班の開発ルールと参照先。', 'レビューとマージのルールは未決定。', '作業前に班の最新ルールを確認する。'],
+  ['AGENTS.md', 'AIを使って開発するときのルール。', '画面側の指示は giftia-frontend/AGENTS.md も確認する。', '変更内容がリポジトリのルールに沿うか確認する。'],
+];
+
 const backendFiles = [
+  ['.env.example', 'API側の環境変数の設定例。', '実際の接続情報は backend/.env に置く。', '接続情報がコミット対象に含まれていないことを確認する。'],
   ['main.py', '検索APIとDB接続確認APIの入口。', '検索条件と順位付けを確認する。現行は商品評価の降順で、同評価は商品ID順。', 'Swagger UIで GET /api/search を試す。'],
   ['database.py', 'Azure MySQLへの接続と読み取り。', '接続情報は backend/.env から読み込む。', 'GET /api/health で接続を確かめる。'],
   ['requirements.txt', 'API側のPython依存関係。', '仮想環境に依存関係を導入する。', 'APIを起動できることを確かめる。'],
 ];
 
+const frontendFiles = [
+  ['package.json / package-lock.json', '画面の起動・ビルド・lintのコマンドと依存関係。', '依存関係の導入は giftia-frontend で npm ci を使う。', 'npm run build でビルドを確認する。'],
+  ['next.config.ts', 'Next.jsの設定。', '画面の開発・ビルド設定を変更するときに確認する。', '開発起動とビルドを確認する。'],
+];
+
 const appFiles = [
+  ['layout.tsx', '全ページ共通のレイアウト。', '共通の表示設定を変更するときに確認する。', '検索画面が開くことを確認する。'],
+  ['globals.css / page.module.css', '全体と検索画面のスタイル。', '共通の指定と画面固有の指定の場所を確認する。', 'PC幅とスマートフォン幅で表示を確認する。'],
   ['page.tsx', '検索条件の入力、結果一覧、検索失敗時の表示。', '既存の検索条件と結果の状態を確認する。', '画面で条件を変更し、検索結果が更新されるかを見る。'],
   ['ResultCard.tsx', '検索結果の商品カード。', '商品情報の表示箇所を確認する。レビューの表示形式は未決定。', '商品名、価格、評価が表示されるかを見る。'],
 ];
@@ -132,20 +147,37 @@ export default function GiftiaDevelopment() {
         <p>要件定義書の第1章ではBR-01〜03が実装範囲です。第3〜4章にはBR-04を参照する機能が残っており、機能要件ID（FR）と要求ID（BR）の対応は未決定です。</p>
       </section>
 
+      <GiftiaArchitecture />
+
       <section id="giftia-files">
         <h2>ファイル一覧（フォルダ構成）</h2>
         <p>ファイル名を選ぶと、役割・実装のヒント・確認方法を読めます。「既存」は開発リポジトリのmainで確認したファイルです。</p>
-        <p>既存の検索は、Next.jsからFastAPIに検索条件を送り、FastAPIが班のAzure MySQLから商品候補を取得します。</p>
+        <h3>既存の主なファイル（main · 6f4eb14）</h3>
+        <FileDetails files={rootFiles} />
         <ul className="giftia-tree">
           <li><code>backend/</code><FileDetails files={backendFiles} /></li>
           <li><code>giftia-frontend/</code>
             <ul>
-              <li><code>app/</code><FileDetails files={appFiles} /></li>
+              <li><FileDetails files={frontendFiles} /></li>
+              <li><code>app/</code><FileDetails files={appFiles} />
+                <ul><li><code>api/search/route.ts</code><span className="giftia-status">空ファイル</span></li></ul>
+              </li>
+              <li><code>public/</code>　ロゴなどの画像素材</li>
               <li><code>lib/</code><FileDetails files={[[ 'api.ts', '検索条件を組み立ててFastAPIを呼び出す。', '既定の接続先は http://localhost:8000。', '検索条件とAPIへの送信内容が一致することを確かめる。' ]]} /></li>
             </ul>
           </li>
         </ul>
-        <p>レビュー表示・アンケート・クーポンの画面パス、APIの入出力、追加ファイルの配置は未決定です。追加データの案は要件定義書の第5章と <Link href="/er">GiftiaのER図</Link> を参照してください。</p>
+        <h3>機能を追加するときの配置例（未決定）</h3>
+        <div className="guide-table-wrap"><table className="guide-table">
+          <thead><tr><th scope="col">場所</th><th scope="col">置く処理・変更内容</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><code>giftia-frontend/app/ResultCard.tsx</code>・<code>lib/api.ts</code></th><td>既存ファイルを拡張してレビューと補足を表示し、APIの応答項目を受け取る。</td></tr>
+            <tr><th scope="row"><code>giftia-frontend/app/survey/page.tsx</code></th><td>購入後アンケートの入力・送信・付与結果の表示を担当する画面の例。</td></tr>
+            <tr><th scope="row"><code>backend/main.py</code>・<code>backend/services/</code></th><td>既存の <code>main.py</code> にAPIの入口を置く。レビューの関連順、回答保存、クーポン付与の処理が増えた段階で <code>services/</code> に分ける案。</td></tr>
+            <tr><th scope="row"><code>backend/migrations/</code>・<code>backend/tests/</code></th><td>スキーマ変更のSQLと、レビュー不足・重複送信などを確かめるテストの置き場所の例。</td></tr>
+          </tbody>
+        </table></div>
+        <p>パスと分割単位は例です。DBの変更内容は要件定義書の第5章と <Link href="/er">GiftiaのER図</Link> を参照し、実装時に決めます。</p>
         <p><a href="https://docs.google.com/document/d/11c8bgBn7rv1tJakj185P-9IZt4PQ-Xo-/edit">Giftia 要件定義書</a> · <a href="https://bts-tech0.netlify.app/guide.html">構成と表記の参考にした実装ガイド</a></p>
       </section>
     </>
