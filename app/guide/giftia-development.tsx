@@ -176,7 +176,8 @@ export default function GiftiaDevelopment() {
           <tbody>
             <tr><th scope="row"><code>giftia-frontend/app/ResultCard.tsx</code>・<code>lib/api.ts</code></th><td>既存ファイルを拡張してレビューと補足を表示し、APIの応答項目を受け取る。</td></tr>
             <tr><th scope="row"><code>giftia-frontend/app/survey/page.tsx</code></th><td>購入後アンケートの入力・送信・付与結果の表示を担当する画面の例。</td></tr>
-            <tr><th scope="row"><code>backend/main.py</code>・<code>backend/services/</code></th><td>既存の <code>main.py</code> にAPIの入口を置く。レビューの関連順、回答保存、クーポン付与の処理が増えた段階で <code>services/</code> に分ける案。</td></tr>
+            <tr><th scope="row"><code>backend/main.py</code>・<code>backend/services/</code></th><td>既存の <code>main.py</code> にAPIの入口を置く。回答保存やクーポン付与の処理が増えた段階で <code>services/</code> に分ける案。</td></tr>
+            <tr><th scope="row"><code>backend/product_evidence.py</code></th><td><a href="#giftia-shared-evidence">検索とチャットが共用する取得処理</a>の配置例。商品説明、レビュー本文、出典IDを取得する。</td></tr>
             <tr><th scope="row"><code>backend/migrations/</code>・<code>backend/tests/</code></th><td>スキーマ変更のSQLと、レビュー不足・重複送信などを確かめるテストの置き場所の例。</td></tr>
           </tbody>
         </table></div>
