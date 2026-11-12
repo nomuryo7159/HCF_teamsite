@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import GiftiaDetail from './giftia-detail';
 import GiftiaArchitecture from './giftia-architecture';
+import GiftiaChatbot from './giftia-chatbot';
 
 const sections = [
   ['giftia-setup', '開発環境の準備'],
   ['giftia-github', 'GitHubでの作業の流れ'],
   ['giftia-order', '担当と作る順番'],
   ['giftia-architecture', 'アーキテクチャ'],
+  ['giftia-chatbot', '購入を後押しするAIチャットボット'],
   ['giftia-files', 'ファイル一覧（フォルダ構成）'],
   ['giftia-scope', '今回の実装範囲と検証方法'],
 ] as const;
@@ -148,6 +150,7 @@ export default function GiftiaDevelopment() {
       </section>
 
       <GiftiaArchitecture />
+      <GiftiaChatbot />
 
       <section id="giftia-files">
         <h2>ファイル一覧（フォルダ構成）</h2>
