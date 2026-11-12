@@ -1,3 +1,5 @@
+import GiftiaDevelopment from './giftia-development';
+
 export default function GiftiaGuide() {
   return (
     <section id="giftia" aria-labelledby="giftia-title">
@@ -5,6 +7,8 @@ export default function GiftiaGuide() {
         <h2 id="giftia-title">Giftia 実装ガイド（暫定版）</h2>
         <p>2026年11月12日の仮確定。送別品を選ぶ人が、候補がその場面に合う理由を確認し、納得して購入を決められるようにします。</p>
       </div>
+
+      <GiftiaDevelopment />
 
       <h3>要求定義と今回の実装範囲</h3>
       <ul className="guide-numbered">
@@ -21,6 +25,13 @@ export default function GiftiaGuide() {
         <li>関連レビューが不足する商品では、商品説明から判断に使える情報を示します。AIによる補足は既存の商品情報を根拠にし、実際の購入者レビューと区別して表示する案です。</li>
         <li>購入後にアンケートへ案内し、回答が完了した人に5%オフクーポンを届けます。回答を他の購入者に提示する方法は要件定義で決めます。</li>
       </ol>
+
+      <h3>手元で確認するケース（案）</h3>
+      <ul className="guide-numbered">
+        <li>送別に関連するレビューがある商品では、そのレビューを先に読める。</li>
+        <li>関連レビューが少ない商品でも商品説明を確認でき、AIの補足と購入者のレビューを見分けられる。</li>
+        <li>アンケート回答完了後に5%オフクーポンが発行され、同じ回答の再送で重複発行されない。</li>
+      </ul>
 
       <h3>3か月ごとに購入率を判定する</h3>
       <p>Exhibit 1 表4の「検索結果ページ」のセッション購入率で、2.4%を超えれば成功、2.4%以下なら仮説を見直します。レビュー表示や補足が判断材料として使われたかも、計測方法を決めて確認します。</p>
