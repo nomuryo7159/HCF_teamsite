@@ -43,7 +43,7 @@
   border-radius: 5px;
   background: var(--soft);
 }
-.giftia-main h3[id] { scroll-margin-top: 110px; }
+.giftia-main h3[id], .giftia-main h4[id] { scroll-margin-top: 110px; }
 .giftia-main summary { cursor: pointer; color: #386948; }
 .giftia-overview-flow { margin: 16px 0; }
 .giftia-overview-flow figcaption { font-weight: 650; }
