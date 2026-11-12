@@ -33,7 +33,7 @@ export default function GiftiaChatbot() {
         <li>レビューがないときは商品説明で確認できる範囲を回答します。モデルのタイムアウトや応答不正時は商品説明への案内と再試行を表示し、検索結果は引き続き利用できるようにします。</li>
       </ul>
 
-      <h3>修正・追加するファイル</h3>
+      <h3 id="giftia-chatbot-files">修正・追加するファイル</h3>
       <div className="guide-table-wrap"><table className="guide-table">
         <thead><tr><th scope="col">区分</th><th scope="col">Giftiaリポジトリ内の場所</th><th scope="col">修正方針</th></tr></thead>
         <tbody>{files.map(([status, path, change]) => (
@@ -41,14 +41,12 @@ export default function GiftiaChatbot() {
         ))}</tbody>
       </table></div>
 
-      <h3>作る順番と確認するケース</h3>
+      <h3 id="giftia-chatbot-checks">作る順番と確認するケース</h3>
       <ol className="guide-numbered">
         <li>商品IDで根拠を取得し、固定の応答で商品カードからチャットまでつなぎます。商品切替と存在しない商品IDを確認します。</li>
         <li>モデルを接続し、関連レビューあり、レビューなし、説明にも根拠なし、存在しない出典ID、タイムアウトを確認します。</li>
-        <li>チャットを開いた・回答を受け取った・購入した、を区別して集計する案です。施策全体の判定は検索結果ページのセッション購入率が3か月ごとの検証で2.4%を超えるかで行います。集計定義とチャットの寄与の比較方法は未決定です。</li>
       </ol>
       <p>採用モデル、レビューの関連度と件数、応答時間・費用の上限、公開時の認証と利用制限、会話の保存は未決定です。初版案は会話履歴をDBに保存せず、検索と別のAPIで動かします。</p>
-      <p>既存ファイルの確認時点は main の <code>6f4eb14</code> です。 <a href="https://github.com/HealthCareFirst/giftia-frontend-backend">Giftia開発リポジトリ</a></p>
     </section>
   );
 }

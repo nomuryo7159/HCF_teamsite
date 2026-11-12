@@ -2,15 +2,17 @@ import Link from 'next/link';
 import GiftiaDetail from './giftia-detail';
 import GiftiaArchitecture from './giftia-architecture';
 import GiftiaChatbot from './giftia-chatbot';
+import { GiftiaScope, GiftiaVerification } from './giftia';
 
 const sections = [
+  ['giftia-scope', '今回の実装範囲'],
   ['giftia-setup', '開発環境の準備'],
   ['giftia-github', 'GitHubでの作業の流れ'],
-  ['giftia-order', '担当と作る順番'],
   ['giftia-architecture', 'アーキテクチャ'],
-  ['giftia-chatbot', '購入を後押しするAIチャットボット'],
-  ['giftia-files', 'ファイル一覧（フォルダ構成）'],
-  ['giftia-scope', '今回の実装範囲と検証方法'],
+  ['giftia-order', '担当と作る順番'],
+  ['giftia-chatbot', 'AIチャットボット'],
+  ['giftia-files', 'ファイル一覧'],
+  ['giftia-verification', '動作確認と施策の検証'],
 ] as const;
 
 const setup = [
@@ -31,9 +33,9 @@ const workflow = [
 
 const modules = [
   { title: '既存検索とデータの確認', reason: 'レビュー表示の実装に先立ち、検索で取得できる項目を把握する。', detail: '検索条件、レビューとシーンの対応、商品説明の取得可否を調べる。', check: 'APIと画面を起動し、条件に合う商品が返ることを確かめる。' },
-  { title: 'レビュー表示とAI補足（BR-01）', reason: '候補商品の取得後に、送別シーンの判断材料を表示する。', detail: '関連度、表示件数、レビュー不足の条件、AI補足の形式は未決定。', check: 'レビューのある商品と少ない商品で表示を確かめる。' },
+  { title: 'レビュー表示とAI補足（BR-01）', reason: '候補商品の取得後に、送別シーンの判断材料を表示する。', detail: '検索結果の商品IDから商品説明とレビューを取得できることが前提。関連度、同順位、表示件数、レビュー不足の条件は未決定。', check: 'レビューのある商品と少ない商品で表示を確かめる。' },
   { title: '購入後アンケート（BR-02）', reason: '回答を集め、次の購入者の判断材料にする。', detail: '購入との紐づけ、設問、回答の公開条件は未決定。', check: '回答が対象の購入に紐づき、保存されることを確かめる。' },
-  { title: '5%オフクーポン（BR-03）', reason: '回答完了を判定できるようになってから付与する。', detail: '配布方法、有効期限、重複発行の防止方法は未決定。', check: '回答完了時に付与され、同じ回答の再送で重複しないことを確かめる。' },
+  { title: '5%オフクーポン（BR-03）', reason: '回答完了を判定できるようになってから付与する。', detail: 'アンケート回答の保存と完了判定が前提。配布方法、有効期限、重複発行の防止方法は未決定。', check: '回答完了時に付与され、同じ回答の再送で重複しないことを確かめる。' },
 ];
 
 const rootFiles = [
@@ -103,6 +105,8 @@ export default function GiftiaDevelopment() {
       <nav aria-label="Giftia実装ガイドの目次">
         {sections.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}
       </nav>
+      <GiftiaScope />
+
       <section id="giftia-setup">
         <h2>開発環境の準備</h2>
         <div className="guide-table-wrap"><table className="guide-table">
@@ -124,6 +128,8 @@ export default function GiftiaDevelopment() {
         <p>ブランチ命名規則、レビューの最低基準、マージ担当、保護設定の担当は未決定です。班のルールはREADMEと <code>AGENTS.md</code> を参照してください。 <a href="https://github.com/HealthCareFirst/giftia-frontend-backend">Giftia開発リポジトリ</a></p>
       </section>
 
+      <GiftiaArchitecture />
+
       <section id="giftia-order">
         <h2>担当と作る順番（案）</h2>
         <div className="guide-table-wrap"><table className="guide-table">
@@ -137,19 +143,9 @@ export default function GiftiaDevelopment() {
             </td><td>未決定</td><td>{reason}</td></tr>
           ))}</tbody>
         </table></div>
-        <h3>後の作業が使うデータと処理</h3>
-        <div className="guide-table-wrap"><table className="guide-table">
-          <thead><tr><th scope="col">使う側</th><th scope="col">先に必要なもの</th><th scope="col">確認先</th></tr></thead>
-          <tbody>
-            <tr><td>レビュー表示・AI補足</td><td>検索結果の商品ID、商品説明、商品に紐づくレビュー</td><td><a href="#giftia-files">既存の検索APIとER図</a></td></tr>
-            <tr><td>購入後アンケート</td><td>回答を対象の購入に紐づける方法</td><td>未決定</td></tr>
-            <tr><td>クーポン付与</td><td>アンケート回答の保存と完了判定</td><td>未決定</td></tr>
-          </tbody>
-        </table></div>
         <p>要件定義書の第1章ではBR-01〜03が実装範囲です。第3〜4章にはBR-04を参照する機能が残っており、機能要件ID（FR）と要求ID（BR）の対応は未決定です。</p>
       </section>
 
-      <GiftiaArchitecture />
       <GiftiaChatbot />
 
       <section id="giftia-files">
@@ -180,9 +176,10 @@ export default function GiftiaDevelopment() {
             <tr><th scope="row"><code>backend/migrations/</code>・<code>backend/tests/</code></th><td>スキーマ変更のSQLと、レビュー不足・重複送信などを確かめるテストの置き場所の例。</td></tr>
           </tbody>
         </table></div>
-        <p>パスと分割単位は例です。DBの変更内容は要件定義書の第5章と <Link href="/er">GiftiaのER図</Link> を参照し、実装時に決めます。</p>
+        <p>チャット固有の変更は <a href="#giftia-chatbot-files">チャットの修正・追加ファイル</a> を参照してください。パスと分割単位は例です。DBの変更内容は要件定義書の第5章と <Link href="/er">GiftiaのER図</Link> を参照し、実装時に決めます。</p>
         <p><a href="https://docs.google.com/document/d/11c8bgBn7rv1tJakj185P-9IZt4PQ-Xo-/edit">Giftia 要件定義書</a> · <a href="https://bts-tech0.netlify.app/guide.html">構成と表記の参考にした実装ガイド</a></p>
       </section>
+      <GiftiaVerification />
     </>
   );
 }
