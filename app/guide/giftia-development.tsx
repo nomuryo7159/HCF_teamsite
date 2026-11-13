@@ -146,7 +146,7 @@ export default function GiftiaDevelopment() {
             </td><td>未決定</td><td>{reason}</td></tr>
           ))}</tbody>
         </table></div>
-        <p>要件定義書の第1章ではBR-01〜03が実装範囲です。第3〜4章にはBR-04を参照する機能が残っており、機能要件ID（FR）と要求ID（BR）の対応は未決定です。</p>
+        <p>Phase1はBR-01〜03です。要件定義書3章に沿い、BR-01はFR-01（シーン選択）・FR-02（レビュー表示）・FR-03（チャット）、BR-02はFR-04（回答フォーム）、BR-03はFR-05（クーポン）に対応します。4.1節のBR-04表記とFR-05の未掲載は要件定義書側で要確認です。</p>
       </section>
 
       <GiftiaChatbot />
