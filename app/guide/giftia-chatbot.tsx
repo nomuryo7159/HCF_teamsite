@@ -14,7 +14,7 @@ export default function GiftiaChatbot() {
   return (
     <section id="giftia-br01" aria-labelledby="giftia-br01-title">
       <h2 id="giftia-br01-title">検索結果から購入判断まで（BR-01・実装案）</h2>
-      <h3>1. 「送別」選択時に検索結果を関連度順に整理する</h3>
+      <h3>1. 「送別」選択時に検索結果を関連度順に整理する（FR-01）</h3>
       <p>検索画面のシーン選択肢には、DBの <code>product_scenes.scene_tag</code> の登録値を重複なく取得して使います。開発DBで確認した値は、お歳暮・お中元・お礼・結婚祝い・出産祝い・送別・誕生日・父の日・母の日の9種類です。BR-01一式を適用するのは「送別」を選んだ場合です。送別以外・未選択は今回の開発スコープ外とし、現行の評価順と商品カードを使います。「送別」を選ぶと、<code>scene_tag = '送別'</code> の商品を候補にします。未選択（ブランク）も選べます。</p>
       <p>要件定義書6.2・6.4に従い、BR-01適用時の候補は送別タグ付きの商品に限定します。検索語の一致数が多い順に並べ、上位5件まで返します。同点時の基準と、一致を数える対象項目・方法は要確認です。0件の場合は該当商品がない旨を表示します。</p>
       <p><strong>修正候補</strong>　<code>giftia-frontend/app/page.tsx</code> にシーンの選択欄を設け、<code>giftia-frontend/lib/api.ts</code> でDB由来の選択肢を取得し、選んだタグを検索APIに送ります。FastAPIは選択肢をDBから返し、検索時に受け取ったタグが登録値であることを確認します。<code>backend/main.py</code> の <code>GET /api/search</code> は、送別選択時にBR-01の適用条件を確認し、適用時のみ検索条件に合う候補を関連度順に並べてから表示件数を適用します。比較実験中は割付先も確認します。</p>
