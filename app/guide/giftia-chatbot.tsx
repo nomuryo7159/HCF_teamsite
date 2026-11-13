@@ -14,13 +14,25 @@ export default function GiftiaChatbot() {
   return (
     <section id="giftia-br01" aria-labelledby="giftia-br01-title">
       <h2 id="giftia-br01-title">検索結果から購入判断まで（BR-01・実装案）</h2>
-      <h3>1. 「送別」選択時に検索結果を関連度順に整理する（FR-01）</h3>
+      <p>機能番号とBRの対応は要件定義書3章に従います。4.1節にはBR-04表記が残っています。候補と順位は6.2・6.4節に従い、6.1節の「絞り込みを選ばない」という説明との整合は要確認です。 <a href="https://docs.google.com/document/d/11c8bgBn7rv1tJakj185P-9IZt4PQ-Xo-/edit">Giftia要件定義書</a></p>
+      <h3>1. シーンを選ぶ（FR-01）</h3>
       <p>検索画面のシーン選択肢には、DBの <code>product_scenes.scene_tag</code> の登録値を重複なく取得して使います。開発DBで確認した値は、お歳暮・お中元・お礼・結婚祝い・出産祝い・送別・誕生日・父の日・母の日の9種類です。BR-01一式を適用するのは「送別」を選んだ場合です。送別以外・未選択は今回の開発スコープ外とし、現行の評価順と商品カードを使います。「送別」を選ぶと、<code>scene_tag = '送別'</code> の商品を候補にします。未選択（ブランク）も選べます。</p>
       <p>要件定義書6.2・6.4に従い、BR-01適用時の候補は送別タグ付きの商品に限定します。検索語の一致数が多い順に並べ、上位5件まで返します。同点時の基準と、一致を数える対象項目・方法は要確認です。0件の場合は該当商品がない旨を表示します。</p>
       <p><strong>修正候補</strong>　<code>giftia-frontend/app/page.tsx</code> にシーンの選択欄を設け、<code>giftia-frontend/lib/api.ts</code> でDB由来の選択肢を取得し、選んだタグを検索APIに送ります。FastAPIは選択肢をDBから返し、検索時に受け取ったタグが登録値であることを確認します。<code>backend/main.py</code> の <code>GET /api/search</code> は、送別選択時にBR-01の適用条件を確認し、適用時のみ検索条件に合う候補を関連度順に並べてから表示件数を適用します。比較実験中は割付先も確認します。</p>
+      <h4>実装手順と確認</h4>
+      <ol className="guide-numbered">
+        <li><code>backend/main.py</code> でタグ一覧を返し、<code>lib/api.ts</code> と <code>page.tsx</code> で未選択を含むプルダウンにつなぎます。</li>
+        <li>送別の導入群で、送別タグ付きの候補を取得し、検索語の一致数順に最大5件を返します。6.4節の「相手」「好み」を検索に渡す方法、自由文をどこで扱うか、0件と判定する一致条件、同点時の順序は実装前に決めます。好みの列名は5.2節の <code>reviews.favorite</code> と6.2節の <code>reviews.favarite</code> を実DBと照合します。</li>
+        <li>誕生日・未選択では既存結果を確認します。送別ではタグなしの商品が混ざらず、同じ入力を3回送っても順位が同じこと、該当なしの表示を確認します。</li>
+      </ol>
       <h3>2. 商品カードに関連レビューと商品説明を表示する（FR-02）</h3>
       <p>レビューコメント欄は開閉式とします。各商品内のレビューは、商品のタグにかかわらず、送別での利用を本文から確認できるものを優先し、根拠になる一節と出典を示します。商品説明から確認できる仕様も表示し、関連レビューが不足する場合は説明を主な判断材料にします。入り数などの情報が見つからない場合は未確認と表示します。</p>
       <p><strong>修正候補</strong>　<code>backend/main.py</code> から商品仕様・レビュー本文・出典を返し、<code>giftia-frontend/lib/api.ts</code> と <code>giftia-frontend/app/ResultCard.tsx</code> で受け取って表示します。商品に付いたシーンタグと、個々のレビューに書かれた利用場面は別々に確認します。</p>
+      <h4>実装手順と確認</h4>
+      <ol className="guide-numbered">
+        <li>共通取得処理から商品IDごとの <code>reviews.comment</code> と出典を返し、<code>lib/api.ts</code> の応答型を拡張します。</li>
+        <li><code>ResultCard.tsx</code> に開閉式のレビュー欄を追加します。本文あり・なしで開閉と表示を確認し、送別以外・未選択では追加欄が出ないことを確認します。商品説明の補足表示はガイド上の追加案です。</li>
+      </ol>
       <h4 id="giftia-shared-evidence">検索とチャットで共用する取得処理</h4>
       <p>FastAPI側の共通処理（配置例は <code>backend/product_evidence.py</code>）は、商品IDを受け取り、商品説明から確認できる仕様、同じ商品に紐づく本文のあるレビュー（reviews.comment）、出典IDを返します。BR-02の回答は、公開・再利用条件が決まった後に取得対象へ加える候補です。</p>
       <ul className="guide-numbered">
@@ -48,7 +60,13 @@ export default function GiftiaChatbot() {
         <li>レビューがないときは商品説明で確認できる範囲を回答します。モデルのタイムアウトや応答不正時は商品説明への案内と再試行を表示し、検索結果は引き続き利用できるようにします。</li>
       </ul>
 
-      <h3>同僚に相談する前に、AIが2つの観点で確認する</h3>
+      <h4>レビューと商品説明のキーワードを使う手順</h4>
+      <ol className="guide-numbered">
+        <li><code>backend/chat.py</code> で、取得済みのレビューコメントと商品説明から質問に関係する語を抽出し、原文と出典IDに紐づけます。キーワード一覧を作る方法と保持先は要確認です。</li>
+        <li>語の一致を根拠候補の選択に使い、原文とともにモデルへ渡します。否定的なレビューは肯定的な推薦理由に使わず、引用を原文と照合します。</li>
+        <li>固定応答で <code>ProductChat.tsx</code> までつないでからモデルを接続します。根拠なし、予算の質問、ギフトと無関係な質問、送別の選択解除を確認します。</li>
+      </ol>
+      <h3>同僚に相談する前に、AIが2つの観点で確認する（追加案）</h3>
       <p>商品カードに「同僚に相談する前に確認」を置く案です。「AIによる2つの観点」と明示し、各観点で選ぶ理由、気になる点、出典を表示します。見方が分かれた場合も両方を示します。</p>
       <figure className="giftia-overview-flow">
         <figcaption>表示例（架空の商品）</figcaption>
