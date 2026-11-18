@@ -5,10 +5,11 @@ const files = [
   ['追加案', 'giftia-frontend/app/ProductChat.tsx', '質問入力、送信中、回答と出典、再試行を表示する。2つの観点と共有用の一文も表示する。画面のスタイルは既存の検索画面に合わせる。'],
   ['修正', 'giftia-frontend/lib/api.ts', 'シーンタグ一覧を取得する呼び出しを追加し、searchGifts で選択値を検索APIに渡す。チャット用の呼び出しでも選択値を送り、検索・チャットの追加応答項目を受け取る。'],
   ['修正', 'backend/main.py', 'product_scenes.scene_tag の重複を除いた一覧を返すAPIを追加する。GET /api/search で選択値を検証し、送別かつBR-01の適用条件を満たす場合に関連度順と追加表示用の情報を返す。POST /api/chat でも適用条件と入力を検証する。直接接続の開発構成では、許可済みオリジンからのPOSTを受け付ける。'],
-  ['追加案', 'backend/product_evidence.py', '商品IDから商品説明、本文のあるレビュー、出典IDを取得する。既存の database.py の fetch_all を使い、検索とチャットに同じ形式で返す。'],
+  ['作成済み（PR前）', 'backend/product_evidence.py', 'get_product_evidence(product_id) が、商品説明・商品仕様・本文のあるレビューを出典ID付きで返す（商品がなければ None）。既存の database.py の fetch_all を使う。AIには問い合わせない。'],
   ['追加案', 'backend/chat.py', '共通の取得処理を呼び、質問に関係する根拠を選ぶ。AIへの問い合わせ、回答と出典の照合、失敗時の処理を担当する。'],
-  ['修正候補', 'backend/.env.example・backend/requirements.txt', '採用するモデルに応じて設定名と依存関係を追加する。キーの実値はサーバーの環境変数で管理する。'],
-  ['追加案', 'backend/tests/test_chat.py', 'DBとモデルを差し替え、根拠がある場合、根拠がない場合、APIの異常系を再現する。'],
+  ['修正候補', 'backend/.env.example・backend/requirements.txt', 'OpenAI API（モデルは gpt-4o-mini で仮決定）の設定名と依存関係を、モデル接続のPRで追加する。キーの実値はサーバーの環境変数で管理する。'],
+  ['作成済み（PR前）', 'backend/tests/test_product_evidence.py', 'DBを差し替え、存在しない商品、空・NULL・空白だけのコメントの除外、★2以下の印、user_id を含まないこと、順番が変わらないこと、NULLの仕様を書かないこと、件数の上限を確かめる。'],
+  ['修正候補', 'backend/tests/test_chat.py', '第1段階（固定の応答）のテストは作成済み。モデル接続のPRで、DBとモデルを差し替え、根拠がある場合、根拠がない場合、APIの異常系を再現するテストを追加する。'],
 ] as const;
 
 export default function GiftiaChatbot() {
@@ -35,7 +36,13 @@ export default function GiftiaChatbot() {
         <li><code>ResultCard.tsx</code> に開閉式のレビュー欄を追加します。本文あり・なしで開閉と表示を確認し、送別以外・未選択では追加欄が出ないことを確認します。商品説明の補足表示はガイド上の追加案です。</li>
       </ol>
       <h4 id="giftia-shared-evidence">検索とチャットで共用する取得処理</h4>
-      <p>FastAPI側の共通処理（配置例は <code>backend/product_evidence.py</code>）は、商品IDを受け取り、商品説明から確認できる仕様、同じ商品に紐づく本文のあるレビュー（reviews.comment）、出典IDを返します。BR-02の回答は、公開・再利用条件が決まった後に取得対象へ加える候補です。</p>
+      <p>FastAPI側の共通処理（<code>backend/product_evidence.py</code>・作成済み、PR前）は、商品IDを受け取り、商品説明から確認できる仕様、同じ商品に紐づく本文のあるレビュー（reviews.comment）、出典IDを返します。BR-02の回答は、公開・再利用条件が決まった後に取得対象へ加える候補です。</p>
+      <ul className="guide-numbered">
+        <li><strong>返す根拠と出典ID</strong>　商品説明（<code>G0001:description</code>）、商品仕様（<code>G0001:spec</code>。価格・サイズ・配送日数・ラッピング・メッセージカードのうち、値がある項目だけ）、購入者レビュー（<code>review:R0123</code>。<code>review_id</code> 順、1商品100件まで）。説明と仕様は同じ商品の行から取るため、商品IDの後ろに種類を付けて区別します。</li>
+        <li><strong>否定的なレビュー</strong>　★2以下に <code>negative</code> の印を付け、一覧からは除きません。推薦理由に使わないことは、モデル接続時のプロンプトで守らせます。</li>
+        <li><strong>使わないデータ</strong>　<code>reviews.user_id</code>・<code>users</code>・<code>orders</code>（個人情報・注文情報をモデルに送らないため）、<code>reviews.person</code>・<code>reviews.favorite</code>（要件定義書5.4により、公開・再利用条件が決まるまで出典に使わないため）。</li>
+        <li><strong>要確認</strong>　列名はER図に合わせており、実際の開発DBとの照合は未実施です。FR-04の回答を <code>reviews</code> に保存すると初期データと区別できなくなるため、FR-04の設計前に見分け方を決めます（要件定義書付録A）。現時点のFR-02の検索は <code>main.py</code> でレビューを直接取得しており、この共通処理はまだ使っていません。</li>
+      </ul>
       <ul className="guide-numbered">
         <li><strong>検索</strong>　検索条件に合う商品候補を取得して並べます。共通処理で取得した情報から、カードに表示する送別向けのレビューを選びます。</li>
         <li><strong>チャット</strong>　選択された商品について共通処理を呼び、質問に関係する情報を選びます。<code>backend/chat.py</code> が生成AIを呼び、回答と出典を照合します。</li>
@@ -104,10 +111,11 @@ export default function GiftiaChatbot() {
       <p>要件定義書6.4に沿い、同じ入力で順位が再現されること、否定的なレビューを推薦理由に使わないこと、引用が実在し、最上位や価格に関する断定に裏付けがあることを確認します。ギフトと無関係な質問は相談の範囲に戻します。</p>
       <h3 id="giftia-chatbot-checks">作る順番と確認するケース</h3>
       <ol className="guide-numbered">
-        <li>商品IDで根拠を取得し、固定の応答で商品カードからチャットまでつなぎます。商品切替と存在しない商品IDを確認します。</li>
+        <li>固定の応答で商品カードからチャットまでつなぎます。商品切替と存在しない商品IDを確認します（第1段階・実装済み）。</li>
+        <li><code>backend/product_evidence.py</code> で商品IDから根拠を取得し、出典IDを付けます。モデルは使わず、DBを差し替えたテストで確認します（作成済み・PR前）。</li>
         <li>モデルを接続し、関連レビューあり、レビューなし、説明にも根拠なし、存在しない出典ID、タイムアウトを確認します。二つの観点で結論が分かれる場合や、一文に未確認の仕様を混ぜないことも確認します。</li>
       </ol>
-      <p>要件定義書7章ではOpenAI APIが挙がっています。具体的なモデル、レビューの関連度と件数、応答時間・費用の上限、公開時の認証と利用制限、会話の保存は未決定です。初版案は会話履歴をDBに保存せず、検索と別のAPIで動かします。</p>
+      <p>要件定義書7章に沿いOpenAI APIを使い、モデルは gpt-4o-mini で仮に進めます。根拠の取得と、モデルへの接続はPRを分けます。レビューの関連度と、モデルに渡す件数、応答時間・費用の上限、公開時の認証と利用制限、会話の保存は未決定です。初版案は会話履歴をDBに保存せず、検索と別のAPIで動かします。</p>
     </section>
   );
 }
